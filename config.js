@@ -5,6 +5,6 @@
    둘 다 비워 두면 '로컬 모드'로 동작합니다 (이 브라우저에만 저장).
    ※ service_role / secret 키는 절대 넣지 마세요. */
 window.HSK_CONFIG = {
-  supabaseUrl: "",
-  supabaseKey: ""
+  supabaseUrl: "https://ltqinmwjmueeqzjtajuc.supabase.co",
+  supabaseKey: "sb_publishable_4ikT1oLe7lIZ5FQOaCwS7A_9nqnRXG4"
 };
