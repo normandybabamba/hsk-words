@@ -1,0 +1,1136 @@
+<title>HSK 단어 서랍</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: 로그인 → iOS 카드 학습(한 손 폰 컬럼, 하단 탭바) ↔ 구석 ERP 버튼으로 사내 ERP 조회 화면. 데이터·진도는 하나. */
+:root{
+  --bg:#f2f2f7; --bg2:#e5e5ea; --card:#ffffff; --label:#000000; --sec:rgba(60,60,67,.6); --ter:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.18); --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2); --seg:#ffffff;
+  --blue:#007aff; --green:#34c759; --orange:#ff9500; --red:#ff3b30; --purple:#af52de;
+  --shadow:0 10px 30px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR",sans-serif;
+  --han:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  /* ERP 고정 팔레트 */
+  --e-win:#d5e3f6; --e-strip:#c2d6f0; --e-panel:#e4edf9; --e-line:#9fb7d9; --e-grid:#d4d4d4; --e-head:#183a73; --e-soft:#7d8ba1; --e-sel:#3767b4; --e-thumb:#5584c6; --e-ro:#e9edf3;
+  --gulim:"Gulim","굴림","GulimChe","Dotum","돋움",Tahoma,"Malgun Gothic",sans-serif;
+  --ui:Tahoma,"Segoe UI","Malgun Gothic","맑은 고딕",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --bg2:#0d0d0f; --card:#1c1c1e; --label:#ffffff; --sec:rgba(235,235,245,.6); --ter:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.6); --fill:rgba(120,120,128,.24); --fill2:rgba(120,120,128,.36); --seg:#636366;
+  --blue:#0a84ff; --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --purple:#bf5af2; --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --bg2:#0d0d0f; --card:#1c1c1e; --label:#ffffff; --sec:rgba(235,235,245,.6); --ter:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.6); --fill:rgba(120,120,128,.24); --fill2:rgba(120,120,128,.36); --seg:#636366;
+  --blue:#0a84ff; --green:#30d158; --orange:#ff9f0a; --red:#ff453a; --purple:#bf5af2; --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg2);color:var(--label);margin:0;font:15px var(--sf);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ===================== iOS ===================== */
+.shell{height:100%;display:flex;justify-content:center}
+.phone{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 0;min-height:44px}
+.deckbtn{background:none;border:0;color:var(--blue);font-size:17px;display:flex;align-items:center;gap:4px;padding:4px 0}
+.deckbtn svg{width:12px;height:12px}
+.erp-pill{border:0;border-radius:999px;padding:6px 12px;background:var(--fill);font:700 12px var(--sf);letter-spacing:.08em;color:var(--label)}
+.large{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.15}
+.sub{color:var(--sec);font-size:15px;margin-top:2px;font-variant-numeric:tabular-nums}
+.tab{flex:1;min-height:0;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 24px;-webkit-overflow-scrolling:touch}
+.study{padding:0 16px;flex:1;min-height:0;display:flex;flex-direction:column}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none;margin:0 -16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:0;border-radius:999px;padding:7px 14px;background:var(--fill);font:500 14px var(--sf);position:relative;font-variant-numeric:tabular-nums}
+.chip.on{background:var(--label);color:var(--bg)}
+.chip.done::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--green);border:1.5px solid var(--bg)}
+.segctl{display:flex;background:var(--fill);border-radius:9px;padding:2px;margin:10px 0 0}
+.segctl button{flex:1;border:0;background:none;padding:6px 0;border-radius:7px;font:500 13px var(--sf)}
+.segctl button.on{background:var(--seg);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.pbar{display:flex;gap:2px;height:4px;margin:12px 0 0}
+.pbar i{flex:1;border-radius:2px;background:var(--fill2);transition:background .2s,transform .2s}
+.pbar i.d{background:var(--green)} .pbar i.x{background:var(--orange)} .pbar i.cur{transform:scaleY(2);background:var(--blue)}
+.stage{flex:1;position:relative;min-height:260px;margin:14px 0 8px}
+.stage .ghost{position:absolute;inset:0;border-radius:26px;background:var(--card);opacity:.55;transform:translateY(10px) scale(.95)}
+.stage .ghost.g2{opacity:.3;transform:translateY(19px) scale(.9)}
+.card{position:absolute;inset:0;background:var(--card);border-radius:26px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:28px 22px;touch-action:none;user-select:none;-webkit-user-select:none;will-change:transform;text-align:center}
+.c-top{position:absolute;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--sec);font-variant-numeric:tabular-nums}
+.badge{padding:3px 9px;border-radius:999px;font-weight:600;font-size:12px}
+.badge.d{background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
+.badge.x{background:color-mix(in srgb,var(--orange) 20%,transparent);color:var(--orange)}
+.fld{position:relative;border-radius:12px;padding:2px 10px;max-width:100%;overflow-wrap:anywhere}
+.f-h{font:500 60px/1.15 var(--han);letter-spacing:.02em}
+.f-h.l5{font-size:46px}.f-h.l7{font-size:36px}.f-h.l10{font-size:28px}
+.f-p{font-size:21px;color:var(--sec);letter-spacing:.01em}
+.f-m{font-size:20px;font-weight:600;line-height:1.4;margin-top:10px}
+.fld.hide{color:transparent!important;background:var(--fill);min-width:120px;cursor:pointer}
+.fld.hide::after{content:"탭해서 보기";position:absolute;inset:0;display:grid;place-items:center;color:var(--ter);font:500 13px var(--sf);letter-spacing:0}
+.f-h.hide{min-width:160px}
+.stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);padding:10px 18px;border-radius:14px;font:700 18px var(--sf);color:#fff;opacity:0;pointer-events:none;white-space:nowrap}
+.stamp.up{background:var(--green)} .stamp.down{background:var(--orange)}
+.stamp.pop{animation:pop .75s ease forwards}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.96)}}
+.empty{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--sec);padding:20px}
+.empty b{color:var(--label);font-size:19px}
+.hint{display:flex;justify-content:center;gap:8px;margin-bottom:8px}
+.hint button{border:0;background:var(--fill);border-radius:999px;padding:7px 12px;font:500 13px var(--sf);display:flex;align-items:center;gap:5px}
+.hint .up{color:var(--green)} .hint .dn{color:var(--orange)}
+.tools{display:flex;align-items:center;gap:8px;padding:0 0 10px}
+.masks{display:flex;background:var(--fill);border-radius:10px;padding:2px;flex:1}
+.masks button{flex:1;border:0;background:none;border-radius:8px;padding:7px 0;font:500 13px var(--sf);display:flex;align-items:center;justify-content:center;gap:4px}
+.masks button.on{background:var(--seg);box-shadow:0 1px 4px rgba(0,0,0,.14);color:var(--blue)}
+.masks svg{width:15px;height:15px}
+.masks .sl{display:none}.masks button.on .sl{display:inline}
+.round{width:38px;height:38px;flex:none;border:0;border-radius:50%;background:var(--fill);display:grid;place-items:center}
+.round svg{width:19px;height:19px;color:var(--blue)}
+.round.on{background:var(--blue)} .round.on svg{color:#fff}
+.tabbar{display:flex;border-top:.5px solid var(--sep);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font:500 10px var(--sf);color:var(--sec)}
+.tabbar button.on{color:var(--blue)}
+.tabbar svg{width:25px;height:25px}
+
+.group{background:var(--card);border-radius:12px;overflow:hidden;margin:8px 0}
+.li{display:flex;align-items:center;gap:12px;padding:11px 16px;min-height:44px;position:relative;width:100%;background:none;border:0;text-align:left;font-size:16px}
+.li+.li::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.li.ind+.li.ind::before{left:62px}
+.li.tap{cursor:pointer}.li.tap:active{background:var(--fill)}
+.li .grow{flex:1;min-width:0}
+.li small{display:block;color:var(--sec);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
+.li .chev{color:var(--ter);font-size:20px;line-height:1}
+.li.red{color:var(--red)} .li.blue{color:var(--blue)}
+.folder{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--c,var(--blue))}
+.folder svg{width:20px;height:20px;color:#fff}
+.more{border:0;background:var(--fill);width:30px;height:30px;border-radius:50%;font-size:16px;line-height:1;color:var(--blue);flex:none}
+.sect{font-size:13px;font-weight:400;color:var(--sec);text-transform:uppercase;letter-spacing:.04em;margin:22px 16px 4px}
+.foot{color:var(--sec);font-size:13px;line-height:1.45;margin:6px 16px}
+.wide{width:100%;border:0;border-radius:12px;padding:14px;background:var(--card);color:var(--blue);font:500 16px var(--sf);margin-top:8px}
+.wide.pri{background:var(--blue);color:#fff}
+.mini{height:4px;border-radius:2px;background:var(--fill2);overflow:hidden;margin-top:6px}
+.mini i{display:block;height:100%;background:var(--green)}
+.sw{appearance:none;-webkit-appearance:none;width:51px;height:31px;border-radius:999px;background:var(--fill2);position:relative;transition:background .2s;flex:none;margin:0;cursor:pointer}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.sw:checked{background:var(--green)} .sw:checked::after{transform:translateX(20px)}
+.stepper{display:flex;align-items:center;background:var(--fill);border-radius:9px;overflow:hidden}
+.stepper button{border:0;background:none;width:40px;height:32px;font-size:20px;color:var(--blue)}
+.stepper b{min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;flex:none;background:linear-gradient(160deg,#8e9aaf,#5c677d)}
+.avatar.big{width:64px;height:64px;font-size:26px}
+.ringbox{display:flex;align-items:center;gap:18px;padding:16px}
+.ring{width:96px;height:96px;flex:none}
+.ring text{fill:var(--label);font:700 22px var(--sf)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-variant-numeric:tabular-nums}
+.kv span{color:var(--sec)} .kv b{text-align:right}
+.daygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.dtile{border:0;background:var(--card);border-radius:12px;padding:10px;text-align:left;font-variant-numeric:tabular-nums}
+.dtile b{display:block;font-size:15px}.dtile small{color:var(--sec);font-size:12px}
+.dtile.on{outline:2px solid var(--blue)}
+.dtile.done b::after{content:" ✓";color:var(--green)}
+
+/* login */
+.login{justify-content:center;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.appicon{width:84px;height:84px;border-radius:20px;margin:0 auto 14px;display:grid;place-items:center;background:linear-gradient(150deg,#ff5e57,#d7263d);color:#fff;font:700 46px var(--han);box-shadow:0 8px 20px rgba(215,38,61,.3)}
+.login h1{text-align:center;font-size:28px;margin:0}
+.login #lList>p{text-align:center;color:var(--sec);margin:6px 0 18px}
+.pinwrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.dots{display:flex;gap:18px;margin:8px 0 6px}
+.dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--label)}
+.dots i.on{background:var(--label)}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.keypad{display:grid;grid-template-columns:repeat(3,76px);gap:14px 24px;margin-top:6px}
+.key{width:76px;height:76px;border-radius:50%;border:0;background:var(--fill);font:400 32px var(--sf);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.key small{font-size:9px;letter-spacing:.2em;font-weight:600;margin-top:2px}
+.key:active{background:var(--fill2)}
+.key.txt{background:none;font-size:16px}
+.pinmsg{min-height:20px;color:var(--red);font-size:14px}
+.linkbtn{border:0;background:none;color:var(--blue);font-size:16px;padding:10px;display:block;margin:6px auto 0}
+
+/* ===================== 공용 오버레이 ===================== */
+.ov{position:fixed;inset:0;z-index:60;display:flex}
+.ov .pb{overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+.ov .lbl{font-size:13px;color:var(--sec)}
+.ov .row2{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.ov .row2 .sp{flex:1}
+.ov .pwrap{max-height:42vh;overflow:auto;border-radius:10px}
+.ov .ptable{border-collapse:collapse;width:100%;font-size:13px}
+.ov .ptable td,.ov .ptable th{padding:5px 6px;text-align:left;vertical-align:top}
+.ov .ptable td[contenteditable]{outline:none;min-width:40px}
+.ov .ptable td.hz{font-family:var(--han);font-size:15px;white-space:nowrap}
+.ov .ptable .del{border:0;background:none;color:var(--red);font-size:15px;padding:0 4px}
+.ov .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ov .opt.han{font-family:var(--han);font-size:20px;text-align:center}
+.ov .qmeta{display:flex;justify-content:space-between;font-size:13px}
+.ov .qcard{display:grid;place-items:center;text-align:center;min-height:110px;padding:12px}
+.ov .qcard .q{font:500 40px var(--han)}
+.ov .qcard .q.ko{font:700 20px var(--sf)}
+.ov .radio{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.ov .radio label{display:flex;gap:6px;align-items:center}
+.ov .drop{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;text-align:center;padding:18px 12px;cursor:pointer}
+.ov .note{font-size:13px;line-height:1.5}
+.ov .list{display:flex;flex-direction:column}
+
+/* iOS 시트 */
+.ov.ios{background:rgba(0,0,0,.4);align-items:flex-end;justify-content:center}
+.ov.ios .panel{width:100%;max-width:440px;max-height:92%;background:var(--bg);border-radius:14px 14px 0 0;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(100%)}}
+.ov.ios .ph{display:grid;grid-template-columns:70px 1fr 70px;align-items:center;padding:14px 12px 8px;font:600 17px var(--sf);text-align:center;position:relative}
+.ov.ios .ph::before{content:"";position:absolute;top:6px;left:50%;width:36px;height:5px;border-radius:3px;background:var(--fill2);transform:translateX(-50%)}
+.ov.ios .ph button{grid-column:3;border:0;background:none;color:var(--blue);font:400 17px var(--sf);text-align:right}
+.ov.ios .pb{padding:6px 16px 18px}
+.ov.ios .btn{border:0;border-radius:12px;padding:13px 16px;background:var(--card);color:var(--blue);font:500 16px var(--sf)}
+.ov.ios .btn.pri{background:var(--blue);color:#fff}
+.ov.ios .btn.danger{color:var(--red)}
+.ov.ios .btn.blk{width:100%}
+.ov.ios .inp{width:100%;border:0;border-radius:10px;background:var(--card);padding:12px 14px;font:16px var(--sf);color:var(--label)}
+.ov.ios .pwrap{background:var(--card)}
+.ov.ios .ptable th{color:var(--sec);font-weight:500;position:sticky;top:0;background:var(--card)}
+.ov.ios .ptable tr+tr td{border-top:.5px solid var(--sep)}
+.ov.ios .opt{border:0;border-radius:12px;background:var(--card);padding:12px;min-height:54px;font:500 15px var(--sf);text-align:left}
+.ov.ios .opt.ok{background:var(--green);color:#fff}.ov.ios .opt.ng{background:var(--red);color:#fff}
+.ov.ios .qcard{background:var(--card);border-radius:16px}
+.ov.ios .qmeta{color:var(--sec)}
+.ov.ios .drop{background:var(--card);border-radius:12px;border:1.5px dashed var(--ter);color:var(--sec)}
+.ov.ios .drop b{color:var(--blue);font-size:16px}
+.ov.ios .note{color:var(--sec)}
+.ov.ios .list .btn{border-radius:0;text-align:left;position:relative}
+.ov.ios .list .btn:first-child{border-radius:12px 12px 0 0}.ov.ios .list .btn:last-child{border-radius:0 0 12px 12px}
+.ov.ios .list .btn+.btn::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.ov.ios details summary{color:var(--blue);cursor:pointer}
+
+/* ERP 다이얼로그 */
+.ov.erp{background:rgba(40,60,90,.35);align-items:center;justify-content:center;padding:16px;font:12px var(--ui);color:#000}
+.ov.erp .panel{width:min(560px,100%);max-height:94%;display:flex;flex-direction:column;background:var(--e-panel);border:1px solid #3f68a8;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.ov.erp .ph{height:26px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 8px;background:linear-gradient(#5d8fd6,#2c5aa5);color:#fff;font:bold 12px var(--gulim);letter-spacing:.08em}
+.ov.erp .ph button{width:22px;height:18px;background:linear-gradient(#e7816d,#c7402a);border:1px solid #8c2a1b;color:#fff;font-size:0;border-radius:2px;position:relative}
+.ov.erp .ph button::after{content:"✕";font-size:11px;position:absolute;inset:0;display:grid;place-items:center}
+.ov.erp .pb{padding:12px 14px 14px}
+.ov.erp .lbl{font:11.5px var(--gulim);letter-spacing:.1em;color:#111}
+.ov.erp .btn{min-width:72px;height:26px;padding:0 10px;border:1px solid #5d82bd;background:linear-gradient(#eaf2fd,#bcd2f0);color:#1d3f7c;font:12px var(--gulim);letter-spacing:.08em;border-radius:2px;box-shadow:inset 0 1px 0 #fff}
+.ov.erp .btn:hover{background:linear-gradient(#fff7da,#f9d778);border-color:#d39b14}
+.ov.erp .btn.danger{color:#a0201a}
+.ov.erp .inp{height:22px;border:1px solid #a5acb5;background:#fff;padding:1px 4px;font:12px var(--ui);width:100%;color:#000}
+.ov.erp textarea.inp{height:auto}
+.ov.erp .pwrap{background:#fff;border:1px solid #a5acb5;border-radius:0}
+.ov.erp .ptable th{position:sticky;top:0;background:linear-gradient(#fff,#e3eaf4);color:var(--e-head);font:bold 12px var(--gulim);border-bottom:1px solid #a9b6c8}
+.ov.erp .ptable td{border-bottom:1px solid #ececec;font-size:12px}
+.ov.erp .opt{min-height:40px;border:1px solid #8ea8cf;background:linear-gradient(#fff,#e2ebf7);padding:4px 8px;text-align:left;font-size:12.5px;border-radius:2px;color:#000}
+.ov.erp .opt:hover{border-color:#d39b14;background:linear-gradient(#fffbea,#fbe6a2)}
+.ov.erp .opt.ok{background:#d6f1d0;border-color:#4b9b3c}.ov.erp .opt.ng{background:#f8d5cf;border-color:#c0402a}
+.ov.erp .qcard{background:#fff;border:1px solid #a5acb5}
+.ov.erp .qcard .q.ko{font:bold 18px var(--gulim)}
+.ov.erp .qmeta{font:11px var(--gulim);color:#3b4f6e;letter-spacing:.05em}
+.ov.erp .drop{background:#fff;border:1px dashed #5d82bd;color:#3b4f6e}
+.ov.erp .drop b{color:#1d3f7c;font-family:var(--gulim)}
+.ov.erp .note{color:#3b4f6e}
+.ov.erp .list{gap:4px}
+.ov.erp .list .btn{text-align:left;height:28px}
+.ov.erp .help p{margin:0 0 6px;line-height:1.6}
+.ov.erp kbd,.ov.ios kbd{border:1px solid var(--ter);padding:0 4px;border-radius:3px;font:11px var(--ui)}
+
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:80;padding:10px 16px;border-radius:999px;background:color-mix(in srgb,var(--label) 88%,transparent);color:var(--bg);font:500 14px var(--sf);pointer-events:none;max-width:calc(100% - 32px);text-align:center;animation:tin .25s}
+.toast.erp{border-radius:0;background:#fffbe0;color:#000;border:1px solid #c8a93d;font:12px var(--gulim);top:auto;bottom:34px}
+@keyframes tin{from{opacity:0;transform:translate(-50%,-8px)}}
+
+/* ===================== ERP ===================== */
+.erp-root{height:100%;background:var(--e-win)}
+.erp{font:12px var(--ui);color:#000}
+.erp .app{display:flex;flex-direction:column;height:100%;min-height:560px;border:1px solid var(--e-line);background:var(--e-win)}
+.erp .ribbon{display:flex;align-items:flex-end;gap:2px;height:30px;padding:0 6px;background:linear-gradient(#e9f1fc,var(--e-strip));border-bottom:1px solid var(--e-line)}
+.erp .orb{width:56px;height:22px;margin-right:8px;border-radius:3px 3px 0 0;background:linear-gradient(#5d8fd6,#2c5aa5);display:grid;place-items:center;flex:none}
+.erp .orb i{width:14px;height:10px;border:1.5px solid #fff;border-radius:1px;background:linear-gradient(90deg,#fff 0 30%,transparent 30%)}
+.erp .rtab{padding:5px 22px 4px;font:11px var(--gulim);color:#3b4f6e;border:1px solid transparent;border-bottom:0;border-radius:3px 3px 0 0;letter-spacing:.06em}
+.erp .rtab.on{background:var(--e-panel);border-color:var(--e-line);color:#1d2f4f;margin-bottom:-1px;padding-bottom:5px}
+.erp .rright{margin-left:auto;align-self:center;display:flex;gap:6px;align-items:center;font:11px var(--gulim);color:#1d2f4f}
+.erp .rbtn{height:20px;padding:0 8px;border:1px solid #5d82bd;background:linear-gradient(#eaf2fd,#bcd2f0);color:#1d3f7c;font:11px var(--gulim);letter-spacing:.05em;border-radius:2px}
+.erp .rbtn:hover{background:linear-gradient(#fff7da,#f9d778);border-color:#d39b14}
+.erp .menubar{display:flex;flex-wrap:wrap;gap:0 2px;padding:3px 4px;background:var(--e-panel);font:12.5px var(--gulim)}
+.erp .menubar button{background:none;border:1px solid transparent;padding:3px 7px;border-radius:2px;color:#111}
+.erp .menubar button:hover,.erp .menubar button.on{background:#fbe9a9;border-color:#e2bd52}
+.erp .menubar .msep{width:1px;background:#b4c6e0;margin:3px 4px}
+.erp .toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:2px 4px 6px;background:var(--e-panel);border-bottom:1px solid var(--e-line)}
+.erp .tb{width:46px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:1px solid transparent;padding:3px 0 2px;font:12px var(--ui);color:#222}
+.erp .tb:hover{background:linear-gradient(#fff6d6,#fbdf8a);border-color:#e0b64a;border-radius:2px}
+.erp .tb svg{width:34px;height:32px}
+.erp .tsep{width:1px;background:#b4c6e0;margin:4px 3px}
+.erp .doctabs{display:flex;align-items:flex-end;justify-content:space-between;padding:6px 2px 0;border-bottom:1px solid var(--e-line)}
+.erp .doctab{padding:4px 8px;background:#fff;border:1px solid var(--e-line);border-bottom:0;color:#2b4b7d;font:12px var(--gulim);letter-spacing:.05em}
+.erp .xbtn{background:none;border:0;color:#2b4b7d;font-weight:bold;font-size:13px;padding:0 6px 3px}
+.erp .body{flex:1;display:grid;grid-template-columns:minmax(260px,456px) 1fr;gap:4px;padding:4px 2px;min-height:0}
+.erp .box{background:var(--e-panel);border:1px solid var(--e-line);display:flex;flex-direction:column;min-width:0;min-height:0}
+.erp .cap{display:flex;align-items:center;gap:5px;height:20px;flex:none;padding:0 6px;background:linear-gradient(#f6f9fe,#dbe6f5);border-bottom:1px solid var(--e-line);font:11px var(--gulim);color:#1f3d70;letter-spacing:.08em}
+.erp .cap svg{width:16px;height:12px}
+.erp .gl{font:11.5px var(--gulim);letter-spacing:.1em;color:#111}
+.erp .form{display:grid;grid-template-columns:118px 1fr;gap:5px 6px;align-items:center;padding:8px 6px}
+.erp .f{height:20px;border:1px solid #a5acb5;background:#fff;padding:1px 3px;font:12px var(--ui);color:#000;min-width:0;border-radius:0}
+.erp .f.ro{background:var(--e-ro);color:#333}
+.erp .f:focus{outline:1px solid #f0b030;border-color:#d39b14}
+.erp .row{display:flex;gap:5px;min-width:0;align-items:center}
+.erp .row>*{min-width:0}
+.erp .combo{position:relative;display:inline-flex;align-items:center}
+.erp .combo>.f{width:100%;appearance:none;-webkit-appearance:none;padding-right:18px}
+.erp .combo::after{content:"";position:absolute;right:6px;top:8px;border:3px solid transparent;border-top:4px solid #444;pointer-events:none}
+.erp .combo.round::after{right:3px;top:3px;width:14px;height:14px;border:0;border-radius:50%;background:radial-gradient(circle at 50% 40%,#5f8ed4,#2e5da8);box-shadow:inset 0 0 0 1px #24508f}
+.erp .combo.round::before{content:"";position:absolute;right:7px;top:7px;width:5px;height:5px;border-right:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(45deg);z-index:1;pointer-events:none}
+.erp .hanzi{height:44px;font:500 26px var(--han);padding:2px 6px;letter-spacing:.04em}
+.erp .ta{position:relative;width:100%;max-width:246px}
+.erp .ta textarea{width:100%;height:56px;border:1px solid #a5acb5;resize:none;padding:3px 20px 3px 4px;font:12.5px var(--ui);background:#fff;color:#000;border-radius:0}
+.erp .ta .vs{position:absolute;right:1px;top:1px;bottom:1px;width:16px;background:#d8e2f0;border-left:1px solid #b5c4da;pointer-events:none}
+.erp .ta .vs i{position:absolute;left:1px;right:1px;top:2px;height:60%;background:var(--e-thumb);border-radius:1px}
+.erp .masked{color:transparent!important;background:repeating-linear-gradient(45deg,#cfd8e6 0 6px,#dfe6f0 6px 12px)!important;cursor:pointer}
+.erp .btnrow{display:flex;flex-wrap:wrap;gap:6px;padding:4px 6px 10px 130px}
+.erp .qbtn{min-width:94px;height:36px;padding:0 10px;border:1px solid #5d82bd;background:linear-gradient(#eaf2fd,#bcd2f0);color:#1d3f7c;font:12px var(--gulim);letter-spacing:.08em;border-radius:2px;box-shadow:inset 0 1px 0 #fff}
+.erp .qbtn:hover{background:linear-gradient(#fff7da,#f9d778);border-color:#d39b14}
+.erp .qbtn.sm{min-width:0;height:26px}
+.erp .stat{margin:auto 6px 8px;border-top:1px solid var(--e-line);padding-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-variant-numeric:tabular-nums}
+.erp .stat div{background:#fff;border:1px solid #c4d1e3;padding:4px 6px}
+.erp .stat b{display:block;font:bold 15px var(--ui);color:var(--e-head)}
+.erp .stat span{font:11px var(--gulim);color:#556;letter-spacing:.05em}
+.erp .bar{grid-column:1/-1;height:10px;background:#fff;border:1px solid #9fb7d9!important;padding:0!important}
+.erp .bar i{display:block;height:100%;background:linear-gradient(#7aa5e2,#3b6cb8);width:0}
+.erp .right{display:flex;flex-direction:column;gap:4px;min-width:0;min-height:0}
+.erp .cond{display:grid;grid-template-columns:repeat(7,auto);gap:6px 14px;align-items:center;justify-content:start;padding:8px;overflow-x:auto}
+.erp .cond .f,.erp .cond .combo{width:130px}
+.erp .chk{display:inline-flex;align-items:center;gap:6px}
+.erp .cb{appearance:none;-webkit-appearance:none;width:13px;height:13px;border:1px solid #7a8aa3;background:linear-gradient(#e9eef5,#fff);margin:0;cursor:pointer;vertical-align:middle;position:relative;border-radius:0;flex:none}
+.erp .cb:checked::after{content:"";position:absolute;left:3px;top:0;width:4px;height:8px;border-right:2px solid #1a3f8a;border-bottom:2px solid #1a3f8a;transform:rotate(40deg)}
+.erp .cb.red:checked::after{border-color:#c0261f}
+.erp .gridbox{flex:1}
+.erp .gwrap{flex:1;overflow:auto;background:#fff;min-height:220px;position:relative}
+.erp table{border-collapse:separate;border-spacing:0;font-size:12px;width:100%;min-width:980px;font-variant-numeric:tabular-nums}
+.erp thead th{position:sticky;top:0;z-index:2;height:22px;background:linear-gradient(#fff,#e3eaf4);border-right:1px solid var(--e-grid);border-bottom:1px solid #a9b6c8;font-family:var(--gulim);letter-spacing:.06em;white-space:nowrap;padding:0 6px;cursor:pointer;user-select:none}
+.erp th.b{color:var(--e-head);font-weight:bold;font-size:12.5px}
+.erp th.s{color:var(--e-soft);font-weight:normal;font-size:11px}
+.erp th .arr{font-size:9px;color:#888;margin-left:3px}
+.erp td{height:21px;border-right:1px solid #ececec;border-bottom:1px solid #ececec;padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;color:#000}
+.erp td.ind{width:16px;padding:0;text-align:center;background:#f3f6fa;border-right:1px solid var(--e-grid);color:#2a4f8f;font-size:11px}
+.erp td.c{text-align:center}
+.erp td.hz{font:500 14px var(--han)}
+.erp td.mn{font-family:var(--gulim);letter-spacing:.03em}
+.erp tbody tr:hover td{background:#f5f9ff}
+.erp tbody tr.cur td{background:#e6eefb}
+.erp tbody tr.cur td.focus{background:var(--e-sel);color:#fff;outline:1px dotted #fff;outline-offset:-2px}
+.erp tbody tr.done td.hz{color:#7a8597}
+.erp tbody tr.cur td.focus.masked{color:transparent}
+.erp .nav{display:flex;align-items:center;gap:2px;height:22px;flex:none;background:linear-gradient(#f5f8fc,#dde6f2);border-top:1px solid var(--e-line);padding:0 6px;font-size:12px;white-space:nowrap;overflow:hidden;min-height:0}
+.erp .nav button{background:none;border:0;color:#5579b2;font-size:11px;padding:0 3px;line-height:1}
+.erp .nav button:hover{color:#0c3a8a}
+.erp .nav .rec{margin:0 8px}
+.erp .nav .hsc{flex:1;height:14px;margin-left:10px;background:#d8e2f0;border:1px solid #b5c4da;position:relative}
+.erp .nav .hsc i{position:absolute;left:12px;top:1px;bottom:1px;width:62%;background:var(--e-thumb)}
+.erp .status{display:flex;height:24px;flex:none;align-items:stretch;background:linear-gradient(#e9f0fa,#cfdcef);border-top:1px solid var(--e-line);font-size:12px;color:#1f3150}
+.erp .status div{padding:4px 22px;border-left:1px solid #a9bcd8;white-space:nowrap}
+.erp .status div:first-child{margin-left:25%}
+@media (max-width:900px){
+  .erp .body{grid-template-columns:1fr}
+  .erp .form{grid-template-columns:96px 1fr}
+  .erp .btnrow{padding-left:6px}
+  .erp .cond{grid-template-columns:auto 1fr}
+  .erp .status{overflow:hidden}.erp .status div:first-child{margin-left:0}
+  .erp .app{height:auto}.erp-root{height:auto;min-height:100%}
+  .erp .gwrap{max-height:70vh}
+}
+@media (max-width:380px){.keypad{grid-template-columns:repeat(3,68px);gap:12px 18px}.key{width:68px;height:68px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<!-- ========== 로그인 ========== -->
+<div id="login" class="shell" hidden>
+  <div class="phone login">
+    <div id="lList">
+      <div class="appicon" aria-hidden="true">汉</div>
+      <h1>HSK 단어 서랍</h1>
+      <p>계정을 선택하세요</p>
+      <div class="group" id="lUsers"></div>
+      <button class="linkbtn" id="lNew">새 계정 만들기</button>
+    </div>
+    <div id="lPin" class="pinwrap" hidden>
+      <div class="avatar big" id="pAva"></div>
+      <div style="font-size:20px;font-weight:600" id="pName"></div>
+      <div class="sub" style="margin:0">암호 4자리를 입력하세요</div>
+      <div class="dots" id="pDots"><i></i><i></i><i></i><i></i></div>
+      <div class="pinmsg" id="pMsg"></div>
+      <div class="keypad" id="pPad"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== iOS ========== -->
+<div id="ios" class="shell" hidden>
+  <div class="phone">
+    <header class="nav">
+      <button class="deckbtn" id="iDeck"><span id="iDeckName">HSK 4급</span><svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
+      <button class="erp-pill" id="iErp" title="ERP 화면으로 보기">ERP</button>
+    </header>
+
+    <section class="tab" id="tStudy">
+      <div class="study">
+        <h1 class="large" id="iTitle">Day 1</h1>
+        <div class="sub" id="iSub"></div>
+        <div class="chips" id="iDays"></div>
+        <div class="segctl" id="iFilter"><button data-f="all">전체</button><button data-f="todo">남은 단어</button><button data-f="x">헷갈림</button></div>
+        <div class="pbar" id="iBar"></div>
+        <div class="stage" id="iStage">
+          <div class="ghost g2"></div><div class="ghost"></div>
+          <div class="card" id="iCard"></div>
+        </div>
+        <div class="hint"><button class="up" id="iUp">↑ 외웠어요</button><button class="dn" id="iDn">↓ 헷갈려요</button><button id="iPrev">←</button><button id="iNext">→</button></div>
+        <div class="tools">
+          <div class="masks" id="iMasks">
+            <button data-k="h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="sl" d="M3 3l18 18"/></svg>한자</button>
+            <button data-k="p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="sl" d="M3 3l18 18"/></svg>병음</button>
+            <button data-k="m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="sl" d="M3 3l18 18"/></svg>뜻</button>
+          </div>
+          <button class="round" id="iSay" title="발음 듣기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg></button>
+          <button class="round" id="iShuf" title="순서 섞기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h3c4 0 6 10 10 10h4M3 17h3c1.6 0 2.8-1.6 4-3.6M14 9.6C15.2 8 16.4 7 18 7h2M17 4l3 3-3 3M17 14l3 3-3 3"/></svg></button>
+          <button class="round" id="iQuiz" title="4지선다 테스트"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab" id="tDrawers" hidden><div class="scroll" id="iDrawers"></div></section>
+    <section class="tab" id="tStats" hidden><div class="scroll" id="iStats"></div></section>
+    <section class="tab" id="tMe" hidden><div class="scroll" id="iMe"></div></section>
+
+    <nav class="tabbar" id="iTabs">
+      <button data-t="tStudy" class="on"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="7" width="16" height="17" rx="3"/><path d="M9 4h10"/></svg>학습</button>
+      <button data-t="tDrawers"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="5" width="20" height="7" rx="2"/><path d="M5.5 12v9a2 2 0 002 2h13a2 2 0 002-2v-9M11 16h6"/></svg>서랍</button>
+      <button data-t="tStats"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 23V14M12 23V8M18 23v-6M24 23V5"/></svg>진도</button>
+      <button data-t="tMe"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="14" cy="10" r="5"/><path d="M5 24c1.5-5 5-7 9-7s7.5 2 9 7"/></svg>내 정보</button>
+    </nav>
+  </div>
+</div>
+
+<!-- ========== ERP ========== -->
+<div id="erp" class="erp erp-root" hidden>
+<div class="app">
+  <div class="ribbon">
+    <div class="orb" aria-hidden="true"><i></i></div>
+    <span class="rtab on">메뉴</span><span class="rtab">데이터</span><span class="rtab">보기</span>
+    <div class="rright"><button class="rbtn" id="eMobile" title="모바일 카드 화면으로">모바일</button><button class="rbtn" id="eLogout">로그아웃</button></div>
+  </div>
+  <nav class="menubar" id="eMenu"></nav>
+  <div class="toolbar">
+    <button class="tb" id="tbOpen" title="파일 올리기 (PDF·CSV·Word)"><svg viewBox="0 0 34 32"><path d="M2 8h10l3 3h15v17H2z" fill="#e8a92a" stroke="#a8730f"/><path d="M5 14h27l-4 14H2z" fill="#fcd25c" stroke="#b9830f"/></svg>올리기</button>
+    <button class="tb" id="tbNew" title="순서 섞기"><svg viewBox="0 0 34 32"><path d="M8 2h13l6 6v22H8z" fill="#fff" stroke="#8a97a8"/><path d="M21 2v6h6" fill="#e6ebf2" stroke="#8a97a8"/></svg>섞기</button>
+    <button class="tb" id="tbSave" title="현재 단어 암기 체크 (Space)"><svg viewBox="0 0 34 32"><rect x="4" y="3" width="26" height="26" rx="2" fill="#4a4f5a" stroke="#22262d"/><rect x="9" y="4" width="16" height="9" fill="#f2f4f7"/><rect x="20" y="5" width="3" height="6" fill="#4a4f5a"/><rect x="8" y="17" width="18" height="11" fill="#9aa7b8"/></svg>암기</button>
+    <button class="tb" id="tbDel" title="이 서랍 진도 초기화"><svg viewBox="0 0 34 32"><path d="M6 5l22 22M28 5L6 27" stroke="#c4221a" stroke-width="6" stroke-linecap="round"/><path d="M6 5l22 22M28 5L6 27" stroke="#ec5a45" stroke-width="2.5" stroke-linecap="round"/></svg>삭제</button>
+    <div class="tsep"></div>
+    <button class="tb" id="tbMask" title="뜻 가리기 켜기/끄기"><svg viewBox="0 0 34 32"><rect x="9" y="2" width="16" height="10" fill="#fff" stroke="#7f8a99"/><rect x="3" y="11" width="28" height="12" rx="2" fill="#a9b3c1" stroke="#5e6877"/><rect x="8" y="19" width="18" height="10" fill="#fff" stroke="#7f8a99"/><path d="M11 23h12M11 26h9" stroke="#9aa4b2"/><circle cx="27" cy="15" r="1.4" fill="#3c9a3c"/></svg>가리기</button>
+    <div class="tsep"></div>
+    <button class="tb" id="tbQuiz" title="4지선다 테스트"><svg viewBox="0 0 34 32"><rect x="3" y="6" width="24" height="18" fill="#cfe0f5" stroke="#4d6f9e"/><rect x="6" y="9" width="18" height="12" fill="#6c9fd9"/><path d="M6 21l6-6 4 4 3-3 5 5z" fill="#3f8a3a"/><circle cx="22" cy="23" r="7" fill="#f2a43a" stroke="#a5620c"/><path d="M19 23l2 2 4-4" stroke="#fff" stroke-width="1.8" fill="none"/></svg>테스트</button>
+    <div class="tsep"></div>
+    <button class="tb" id="tbHelp" title="도움말"><svg viewBox="0 0 34 32"><circle cx="17" cy="16" r="13" fill="#2f6fd0" stroke="#1a4b98"/><circle cx="17" cy="16" r="10.5" fill="none" stroke="#7fb2f2"/><text x="17" y="22" font-family="Tahoma,Arial" font-weight="bold" font-size="17" fill="#fff" text-anchor="middle">?</text></svg>Help</button>
+  </div>
+  <div class="doctabs"><span class="doctab" id="eDocTab">HSK 단어 암기 조회</span><button class="xbtn" title="검색어 지우기" id="eX">×</button></div>
+
+  <div class="body">
+    <section class="box">
+      <div class="cap"><svg viewBox="0 0 16 12"><rect x=".5" y=".5" width="15" height="11" fill="#fff" stroke="#3b5f97"/><rect x=".5" y=".5" width="15" height="3" fill="#3b5f97"/></svg>단어등록</div>
+      <div class="form">
+        <span class="gl">서랍</span><input class="f ro" id="dSrc" readonly style="max-width:120px">
+        <span class="gl">일차</span><div class="row"><input class="f ro" id="dDay" readonly style="width:120px"></div>
+        <span class="gl">번호</span><div class="row"><span class="combo" style="width:120px"><input class="f" id="dNo" inputmode="numeric" title="번호 입력 후 Enter"></span><input class="f ro" id="dTot" readonly style="width:118px"></div>
+        <span class="gl">중국어</span><input class="f hanzi" id="dHan" readonly style="max-width:246px">
+        <span class="gl">병음</span><input class="f" id="dPy" readonly style="max-width:246px">
+        <span class="gl">학습상태</span>
+        <div class="row"><span class="combo round" style="width:120px"><select class="f" id="dState"><option value="0">미암기</option><option value="1">외움</option><option value="2">헷갈림</option></select></span><input class="f ro" id="dCnt" readonly style="width:118px"></div>
+        <span class="gl">메모</span><input class="f" id="dMemo" placeholder="예문·연상법 메모" style="max-width:194px">
+        <span class="gl" style="align-self:start;padding-top:4px">뜻</span>
+        <div class="ta"><textarea id="dMean" readonly></textarea><div class="vs"><i></i></div></div>
+        <span class="gl">테스트구분</span>
+        <span class="combo" style="width:120px"><select class="f" id="dDir"><option value="h2k">중국어→뜻</option><option value="k2h">뜻→중국어</option><option value="p2k">병음→뜻</option></select></span>
+      </div>
+      <div class="btnrow">
+        <button class="qbtn sm" id="bPrev">◀ 이전</button><button class="qbtn sm" id="bNext">다음 ▶</button>
+        <button class="qbtn sm" id="bSay">🔊 발음</button><button class="qbtn sm" id="bShow">뜻 보기</button>
+      </div>
+      <div class="stat">
+        <div><b id="sDone">0</b><span>외움</span></div><div><b id="sWrong">0</b><span>헷갈림</span></div><div><b id="sTodo">0</b><span>남은 단어</span></div>
+        <div class="bar"><i id="sBar"></i></div>
+      </div>
+    </section>
+    <div class="right">
+      <section class="box">
+        <div class="cap"><svg viewBox="0 0 16 12"><rect x=".5" y=".5" width="15" height="11" fill="#fff" stroke="#3b5f97"/><rect x=".5" y=".5" width="15" height="3" fill="#3b5f97"/></svg>조회조건</div>
+        <div class="cond">
+          <span class="gl">조회일차</span><span class="combo"><select class="f" id="cD1"></select></span>
+          <span class="gl">서랍</span><span class="combo"><select class="f" id="cDeck"></select></span>
+          <span class="gl">학습상태</span><span class="combo round"><select class="f" id="cState"><option value="all">(전체)</option><option value="todo">미암기</option><option value="done">외움</option><option value="wrong">헷갈림</option></select></span>
+          <span style="grid-row:span 2;display:flex;align-items:center;gap:12px"><span class="chk"><label class="gl" for="cH">한자가리기</label><input type="checkbox" class="cb" id="cH"></span><button class="qbtn" id="bTest">랜덤 테스트</button></span>
+          <span class="gl">~</span><span class="combo"><select class="f" id="cD2"></select></span>
+          <span class="gl">가리기</span><span class="chk"><label class="gl" for="cP">병음</label><input type="checkbox" class="cb" id="cP"><label class="gl" for="cM">뜻</label><input type="checkbox" class="cb" id="cM"></span>
+          <span class="gl">검색 %</span><input class="f" id="cQ" placeholder="한자·병음·뜻">
+        </div>
+      </section>
+      <section class="box gridbox">
+        <div class="cap"><svg viewBox="0 0 16 12"><rect x=".5" y=".5" width="15" height="11" fill="#fff" stroke="#3b5f97"/><rect x=".5" y=".5" width="15" height="3" fill="#3b5f97"/></svg>단어 목록 조회</div>
+        <div class="gwrap" id="gwrap">
+          <table>
+            <thead><tr>
+              <th style="width:16px;padding:0"></th>
+              <th class="b" data-k="day">일차</th><th class="s" data-k="no">No</th><th class="b" data-k="han">중국어</th>
+              <th class="s" data-k="py">병음(성조)</th><th class="b" data-k="mn" style="width:28%">뜻</th><th class="s" data-k="memo">메모</th>
+              <th class="s" data-k="done">외움</th><th class="b" data-k="wrong">헷갈림</th><th class="s" data-k="cnt">학습횟수</th><th class="b" data-k="last">최근학습</th>
+            </tr></thead>
+            <tbody id="eTb"></tbody>
+          </table>
+        </div>
+        <div class="nav">
+          <button data-n="first" title="처음">|◀</button><button data-n="pp" title="이전 페이지">◀◀</button><button data-n="p" title="이전">◀</button>
+          <span class="rec" id="eRec">Record 0 of 0</span>
+          <button data-n="n" title="다음">▶</button><button data-n="nn" title="다음 페이지">▶▶</button><button data-n="last" title="마지막">▶|</button>
+          <button data-n="done" title="외움 체크">✓</button><button data-n="wrong" title="헷갈림 체크">✕</button>
+          <span class="hsc"><i></i></span>
+        </div>
+      </section>
+    </div>
+  </div>
+  <footer class="status"><div>HSK900 (V1.0)</div><div id="eUser">-</div><div id="eCnt">HSKERP</div></footer>
+</div>
+</div>
+
+<div class="ov" id="ov" hidden><div class="panel" role="dialog" aria-modal="true" aria-labelledby="ovT"><div class="ph"><span id="ovT"></span><button id="ovX">닫기</button></div><div class="pb" id="ovB"></div></div></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ===== 단어 파일 인식기: 표의 행(row)마다 한자 / 병음 / 한글 뜻을 문자 종류로 구분 ===== */
+const WP=(()=>{
+const isH=c=>/[\u3400-䶿一-\u9fff豈-﫿〇]/.test(c);
+const isK=c=>/[가-힣ㄱ-ㆎ]/.test(c);
+const isL=c=>/[A-Za-zÀ-ÖØ-öø-ɏ]/.test(c);
+const HEAD=/^(no\.?|번호|순번|중국어|한자|단어|병음.*|pinyin|뜻.*|의미|한국어.*|meaning|hanzi|chinese|korean|중국어\s*쓰기|뜻\s*쓰기)$/i;
+const norm=s=>String(s||"").normalize("NFC").replace(/[ 　]/g," ").replace(/\s+/g," ").trim();
+function tokenizeCell(text){
+  const segs=[];let pend="",cur=null,sawK=false;
+  for(const ch of text){
+    const t=isH(ch)?"H":isK(ch)?"K":isL(ch)?"L":"O";
+    if(t==="O"){if(cur)cur.s+=ch;else pend+=ch;continue}
+    if(cur&&cur.t===t){cur.s+=ch;continue}
+    if(cur&&t!=="H"&&cur.t!=="H"&&/[(（\[]\s*$/.test(cur.s)&&cur.t==="K"){cur.s+=ch;continue}
+    if(t==="K"&&cur&&cur.t==="L"){const mm=cur.s.match(/\s(\d+)\s*$/);if(mm){cur.s=cur.s.slice(0,mm.index);pend=mm[1]+pend}}
+    if(cur&&cur.t==="L"&&t==="K")cur.beforeK=true;
+    cur={t,s:pend+ch,first:!segs.length,afterK:sawK};pend="";segs.push(cur);if(t==="K")sawK=true;
+  }
+  return segs.map(g=>{let s=g.s.trim();
+    if(g.t==="H")s=s.replace(/^\d+[.)]\s*|^\d+\s+/,"").replace(/[\s,，;；/]+$/,"");
+    else s=s.replace(/^[\s,;/·\-–]+|[\s,;/·\-–]+$/g,"");
+    return Object.assign(g,{s})}).filter(g=>g.s);
+}
+const jn=(a,b,sep=" ")=>a?a+sep+b:b;
+function rowsToWords(rows){
+  const out=[];let cur=null,prevWord=false;
+  for(const cells of rows){
+    let hasNum=false;const toks=[];
+    for(const raw of cells){const c=norm(raw);if(!c)continue;
+      if(/^\d+[.)]?$/.test(c)){hasNum=true;continue}
+      if(HEAD.test(c))continue;
+      toks.push(...tokenizeCell(c))}
+    if(!toks.length){if(!cells.length)prevWord=false;continue}
+    const starts=[];toks.forEach((t,i)=>{if(t.t==="H"&&t.first)starts.push(i)});
+    if(starts.length){
+      starts.forEach((s,k)=>{
+        const g=toks.slice(k===0?0:s,k+1<starts.length?starts[k+1]:toks.length);
+        const w={h:"",p:"",m:""};let hd=false;
+        for(const t of g){
+          if(t.t==="H"){if(!hd&&t.first){w.h=t.s;hd=true}else w.m=jn(w.m,t.s,"")}
+          else if(t.t==="L"&&!t.afterK&&!(w.p&&t.beforeK&&!/[\u00c0-\u024f]/.test(t.s)))w.p=jn(w.p,t.s);
+          else w.m=jn(w.m,t.s,t.first?", ":" ");
+        }
+        out.push(w);cur=w});
+      prevWord=true;
+    }else if(cur&&prevWord&&!hasNum&&(cur.p||cur.m)){
+      const txt=norm(cells.join(" "));
+      if(txt.length<=40&&!/[|]/.test(txt)){for(const t of toks){if(t.t==="L"&&!t.afterK&&!(t.first===false&&cur.m&&false))cur.p=jn(cur.p,t.s);else cur.m=jn(cur.m,t.s)}}
+      else prevWord=false;
+    }else prevWord=false;
+  }
+  return out.filter(w=>w.h&&(w.p||w.m)).map(w=>[w.h,w.p,w.m]);
+}
+function parseCSV(text){
+  const rows=[];let row=[],f="",q=false;
+  const delim=(text.split("\n").slice(0,20).join("").match(/\t/g)||[]).length>2?"\t":",";
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c;continue}
+    if(c==='"'&&!f)q=true;else if(c===delim){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}
+    else f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}
+  return rows;
+}
+function textToRows(text){
+  const lines=text.split(/\r?\n/);
+  if(lines.filter(l=>/\t/.test(l)).length>lines.length*.3||lines.filter(l=>/,/.test(l)).length>lines.length*.5)return parseCSV(text);
+  return lines.map(l=>l.split(/\s{3,}/));
+}
+function decode(buf){
+  try{return new TextDecoder("utf-8",{fatal:true}).decode(buf).replace(/^﻿/,"")}
+  catch(e){try{return new TextDecoder("euc-kr").decode(buf)}catch(e2){return new TextDecoder().decode(buf)}}
+}
+/* pdf.js 텍스트 조각 → 줄 → 칸 */
+function pdfItemsToRows(items){
+  const its=items.filter(i=>i.str&&i.str.trim()).map(i=>{const fs=Math.hypot(i.transform[2],i.transform[3])||Math.abs(i.transform[3])||10;return{s:i.str,x:i.transform[4],y:i.transform[5],w:i.width||fs*i.str.length*.5,fs}});
+  its.sort((a,b)=>b.y-a.y||a.x-b.x);
+  const lines=[];
+  for(const it of its){const L=lines.find(l=>Math.abs(l.y-it.y)<=it.fs*.45);if(L)L.items.push(it);else lines.push({y:it.y,items:[it]})}
+  lines.sort((a,b)=>b.y-a.y);
+  lines.forEach(l=>{l.fs=l.items[0].fs;l.cells=lineCells(l);const t=l.cells.map(c=>c.s).join(" ");
+    l.anchor=l.cells.some(c=>/^\s*\d*\s*[\u3400-\u9fff]/.test(c.s))||l.cells.some(c=>/^\d+[.)]?$/.test(c.s.trim()));l.txt=t});
+  /* 칸 안에서 두 줄로 넘어간 뜻/병음은 가장 가까운 단어 줄에 붙인다 (세로 가운데 정렬 표 대응) */
+  const anchors=lines.filter(l=>l.anchor);
+  lines.forEach(l=>{if(l.anchor||l.txt.length>40||/[|]/.test(l.txt))return;
+    let best=null,bd=1e9;anchors.forEach(a=>{const d=Math.abs(a.y-l.y);if(d<bd){bd=d;best=a}});
+    if(!best||bd>l.fs*1.6)return;
+    const plan=[];
+    for(const c of l.cells){if(HEAD.test(norm(c.s)))return;
+      let tc=null,td=1e9;best.cells.forEach(b=>{const d=Math.abs(b.x-c.x);if(d<td){td=d;tc=b}});
+      const kind=s=>/[\uac00-\ud7a3]/.test(s)?"K":/[\u3400-\u9fff]/.test(s)?"H":/^\s*\d+[.)]?\s*$/.test(s)?"N":"L";
+      if(kind(c.s)==="H"||kind(c.s)==="N")return;
+      if(!tc||td>l.fs*1.5){if(c.x<=Math.max(...best.cells.map(b=>b.x)))return;plan.push([null,c]);continue}
+      if(kind(tc.s)!==kind(c.s))return;
+      plan.push([tc,c.s])}
+    plan.forEach(([tc,s])=>{if(!tc){best.cells.push({x:s.x,s:s.s});return}(l.y>best.y?(tc.pre=tc.pre||[]):(tc.post=tc.post||[])).push(s)});
+    l.merged=true});
+  const rows=[];let py=null;
+  lines.forEach(l=>{if(l.merged)return;if(py!==null&&py-l.y>l.fs*1.75)rows.push([]);py=l.y;
+    l.cells.sort((a,b)=>a.x-b.x);rows.push(l.cells.map(c=>[...(c.pre||[]),c.s,...(c.post||[])].join(" ")))});
+  rows.push([]);return rows;
+  function lineCells(l){l.items.sort((a,b)=>a.x-b.x);const cells=[];let last=null;
+    for(const it of l.items){if(last&&it.x-(last.x+last.w)<=it.fs*1.1){cells[cells.length-1].s+=(it.x-(last.x+last.w)>it.fs*.2&&!/[\d㐀-鿿]$/.test(cells[cells.length-1].s)||it.x-(last.x+last.w)>it.fs*.2&&!/^[㐀-鿿]/.test(it.s)?" ":"")+it.s}else cells.push({x:it.x,s:it.s});last=it}
+    return cells}
+}
+function htmlTablesToRows(html){
+  const doc=new DOMParser().parseFromString(html,"text/html");const rows=[];
+  const trs=doc.querySelectorAll("tr");
+  if(trs.length){trs.forEach(tr=>rows.push([...tr.children].map(td=>{const ps=td.querySelectorAll("p");return ps.length?[...ps].map(p=>p.textContent).join(" "):td.textContent})))}
+  else doc.querySelectorAll("p,li").forEach(p=>rows.push(p.textContent.split(/\t|\s{3,}/)));
+  return rows;
+}
+function dedupe(list,existing){
+  const seen=new Set(existing||[]);const out=[];let dup=0;
+  for(const w of list){if(seen.has(w[0])){dup++;continue}seen.add(w[0]);out.push(w)}
+  return{words:out,dup};
+}
+return{rowsToWords,parseCSV,textToRows,decode,pdfItemsToRows,htmlTablesToRows,dedupe,tokenizeCell};
+})();
+
+
+</script>
+<script>
+const SEED={"hsk4":[["经验丰富","jīngyàn fēngfù","경험이 풍부하다"],["热情可爱","rèqíng kě'ài","열정적이고 사랑스럽다"],["态度认真","tàidu rènzhēn","태도가 진지하다"],["长得漂亮","zhǎng de piàoliang","외모가 예쁘다"],["工作环境","gōngzuò huánjìng","근무 환경"],["吃饭时间","chīfàn shíjiān","식사 시간"],["同事关系","tóngshì guānxi","동료 관계"],["生活态度","shēnghuó tàidu","생활 태도"],["上网","shàngwǎng","인터넷을 하다"],["运动","yùndòng","운동하다"],["做家务","zuò jiāwù","집안일을 하다"],["参加聚会","cānjiā jùhuì","모임에 참석하다"],["变瘦了","biàn shòu le","말라졌다"],["个子高了","gèzi gāo le","키가 커졌다"],["心情好了","xīnqíng hǎo le","기분이 좋아졌다"],["饭吃得少了","fàn chī de shǎo le","밥을 적게 먹게 됐다"],["9号没上","jiǔ hào méi shàng","9번이 타지 않았다 / 안 나왔다 (문맥 필요)"],["天气不好","tiānqì bù hǎo","날씨가 좋지 않다"],["观众太少","guānzhòng tài shǎo","관중이 너무 적다"],["力气不够","lìqi bú gòu","힘이 부족하다"],["茶","chá","차"],["果汁","guǒzhī","과일주스"],["咖啡","kāfēi","커피"],["牛奶","niúnǎi","우유"],["东西卖完","dōngxi mài wán","물건이 다 팔리다"],["活动结束","huódòng jiéshù","행사가 끝나다"],["价格太贵","jiàgé tài guì","가격이 너무 비싸다"],["质量会差","zhìliàng huì chà","품질이 나쁠 것이다"],["饿极了","è jí le","몹시 배고프다"],["刚起床","gāng qǐchuáng","막 일어났다"],["特别困","tèbié kùn","특히 졸리다"],["回来得晚","huílái de wǎn","늦게 돌아오다"],["正合适","zhèng héshì","딱 알맞다"],["有点儿厚","yǒudiǎnr hòu","약간 두껍다"],["孩子会喜欢","háizi huì xǐhuan","아이가 좋아할 것이다"],["小了一点儿","xiǎo le yìdiǎnr","조금 작아졌다"],["船","chuán","배"],["火车","huǒchē","기차"],["飞机","fēijī","비행기"],["出租车","chūzūchē","택시"],["把票弄丢了","bǎ piào nòng diū le","표를 잃어버렸다"],["来得太早了","lái de tài zǎo le","너무 일찍 왔다"],["看错了时间","kàn cuò le shíjiān","시간을 잘못 봤다"],["坐错了座位","zuò cuò le zuòwèi","자리를 잘못 앉았다"],["开证明","kāi zhèngmíng","증명서를 발급하다"],["去应聘","qù yìngpìn","면접 보러 가다 / 지원하다"],["见王教授","jiàn Wáng jiàoshòu","왕 교수님을 만나다"],["和女的约会","hé nǚ de yuēhuì","여성과 데이트하다"],["参加的人数","cānjiā de rénshù","참가 인원"],["举办的城市","jǔbàn de chéngshì","개최 도시"],["专门的网站","zhuānmén de wǎngzhàn","전문 웹사이트"],["招聘的时间","zhāopìn de shíjiān","채용 시기"],["超市","chāoshì","슈퍼마켓"],["邮局","yóujú","우체국"],["球场","qiúchǎng","구장"],["理发店","lǐfàdiàn","이발소 / 미용실"],["打针","dǎzhēn","주사를 맞다"],["看病","kànbìng","진찰받다 / 병원에 가다"],["吃药","chīyào","약을 먹다"],["住院","zhùyuàn","입원하다"],["一个人","yí ge rén","한 사람 / 혼자"],["一本小说","yì běn xiǎoshuō","소설 한 권"],["一部电影","yí bù diànyǐng","영화 한 편"],["一次会议","yí cì huìyì","회의 한 차례"],["出发时间","chūfā shíjiān","출발 시간"],["旅游信息","lǚyóu xìnxī","여행 정보"],["天气情况","tiānqì qíngkuàng","날씨 상황"],["便宜的机票","piányi de jīpiào","저렴한 항공권"],["邻居","línjū","이웃"],["师生","shīshēng","교사와 학생"],["同事","tóngshì","직장 동료"],["夫妻","fūqī","부부"],["迷路了","mí lù le","길을 잃었다"],["病得厉害","bìng de lìhai","심하게 아프다"],["丢了钱包","diū le qiánbāo","지갑을 잃어버렸다"],["考得不好","kǎo de bù hǎo","시험을 잘 못 봤다"],["参加大赛","cānjiā dàsài","대회에 참가하다"],["锻炼身体","duànliàn shēntǐ","몸을 단련하다"],["看一个节目","kàn yí ge jiémù","프로그램을 보다"],["帮女的忙","bāng nǚ de máng","여성을 돕다"],["总结经验","zǒngjié jīngyàn","경험을 정리하다"],["研究材料","yánjiū cáiliào","자료를 연구하다"],["进行会议","jìnxíng huìyì","회의를 진행하다"],["在银行对面","zài yínháng duìmiàn","은행 맞은편에"],["菜有点儿咸","cài yǒudiǎnr xián","음식이 조금 짜다"],["女的以前去过","nǚ de yǐqián qù guo","여자는 이전에 가 본 적 있다"],["只有面条和饺子","zhǐ yǒu miàntiáo hé jiǎozi","국수와 만두만 있다"],["买沙发","mǎi shāfā","소파를 사다"],["修空调","xiū kōngtiáo","에어컨을 수리하다"],["收拾行李","shōushi xíngli","짐을 정리하다"],["检查身体","jiǎnchá shēntǐ","건강검진을 받다"],["进行比赛","jìnxíng bǐsài","시합을 진행하다"],["讨论问题","tǎolùn wèntí","문제를 토론하다"],["打印材料","dǎyìn cáiliào","자료를 인쇄하다"],["应聘工作","yìngpìn gōngzuò","일자리에 지원하다"],["逛街了","guàng jiē le","거리를 구경했다 / 쇼핑했다"],["加班了","jiābān le","야근했다"],["看房子了","kàn fángzi le","집을 보러 갔다"],["去运动了","qù yùndòng le","운동하러 갔다"],["按时吃药","ànshí chī yào","제시간에 약을 먹다"],["今天很特别","jīntiān hěn tèbié","오늘은 특별하다"],["别忘记带伞","bié wàngjì dài sǎn","우산 챙기는 걸 잊지 마"],["不要乱放东西","bú yào luàn fàng dōngxi","물건을 함부로 두지 마"],["没有拿报纸","méiyǒu ná bàozhǐ","신문을 가져오지 않았다"],["平时在家很懒","píngshí zài jiā hěn lǎn","평소 집에서 게으르다"],["今天想换座位","jīntiān xiǎng huàn zuòwèi","오늘 자리를 바꾸고 싶다"],["没理解妻子的话","méi lǐjiě qīzi de huà","아내 말을 이해하지 못했다"],["颜色会变","yánsè huì biàn","색이 변할 것이다"],["样子不同","yàngzi bùtóng","모양이 다르다"],["秋天掉叶","qiūtiān diào yè","가을에 잎이 떨어지다"],["大小相同","dàxiǎo xiāngtóng","크기가 같다"],["要支持孩子","yào zhīchí háizi","아이를 지지해야 한다"],["走自己的路","zǒu zìjǐ de lù","자신의 길을 가다"],["有积极的态度","yǒu jījí de tàidu","적극적인 태도를 지니다"],["不要和别人比较","bú yào hé biérén bǐjiào","다른 사람과 비교하지 마"],["电视剧","diànshìjù","TV 드라마"],["网站","wǎngzhàn","웹사이트"],["广告","guǎnggào","광고"],["杂志","zázhì","잡지"],["打扮","dǎban","꾸미다 / 치장하다"],["艺术","yìshù","예술"],["健康","jiànkāng","건강하다 / 건강"],["经济","jīngjì","경제"],["搬回家住","bān huí jiā zhù","집으로 돌아가 살다"],["陪父母旅行","péi fùmǔ lǚxíng","부모님과 여행하다"],["去外地工作","qù wàidì gōngzuò","타지에 일하러 가다"],["周末一起回家","zhōumò yìqǐ huí jiā","주말에 함께 집에 가다"],["饭菜吃不完","fàncài chī bu wán","음식을 다 먹지 못하다"],["父母没人陪","fùmǔ méi rén péi","부모님 곁에 함께할 사람이 없다"],["爸爸抽烟太多","bàba chōuyān tài duō","아버지가 담배를 너무 많이 피운다"],["爸妈不会做饭","bà mā bú huì zuò fàn","부모님은 요리를 못하신다"],["新闻里","xīnwén li","뉴스에"],["笑话里","xiàohua li","농담 속에"],["广告上","guǎnggào shàng","광고에"],["小说里","xiǎoshuō li","소설 속에"],["饼干","bǐnggān","비스킷"],["饮料","yǐnliào","음료"],["家具","jiājù","가구"],["餐厅","cāntīng","식당"],["海洋","hǎiyáng","해양 / 바다"],["商量","shāngliang","상의하다 / 의논하다"],["节","jié","절약하다 / 절 / 명절"],["坚持","jiānchí","견지하다 / 꾸준히 하다"],["接受","jiēshòu","받아들이다 / 수락하다"],["从来","cónglái","줄곧 / 여태껏"],["教育","jiàoyù","교육"],["父母","fùmǔ","부모"],["上大学","shàng dàxué","대학에 다니다"],["一周","yì zhōu","일주일"],["汉语课","Hànyǔ kè","중국어 수업"],["专家","zhuānjiā","전문가"],["认为","rènwéi","~라고 생각하다"],["塑料垃圾","sùliào lājī","플라스틱 쓰레기"],["环境变差","huánjìng biàn chà","환경이 나빠지다"],["主要原因","zhǔyào yuányīn","주요 원인"],["节约用水","jiéyuē yòngshuǐ","물을 절약하여 쓰다"],["生气","shēngqì","화가 나다"],["申请","shēnqǐng","신청하다"],["留学","liúxué","유학하다"],["需要","xūyào","필요하다"],["先","xiān","먼저"],["减肥","jiǎnféi","다이어트하다"],["关键","guānjiàn","핵심 / 관건"],["每天","měitiān","매일"],["锻炼","duànliàn","운동하다 / 단련하다"],["而且","érqiě","게다가"],["招聘","zhāopìn","채용하다"],["公司","gōngsī","회사"],["非常","fēicháng","매우"],["但是","dànshì","하지만"],["想","xiǎng","~하고 싶다 / 생각하다"],["工资","gōngzī","급여 / 임금"],["水平","shuǐpíng","수준"],["按照","ànzhào","~에 따라"],["现在","xiànzài","지금"],["既然","jìrán","이왕 ~인 이상"],["质量","zhìliàng","품질"],["过年","guònián","설을 쇠다"],["一般","yìbān","보통"],["所有","suǒyǒu","모든"],["亲戚","qīnqi","친척"],["聚在一起","jù zài yìqǐ","한곳에 모이다"],["中国人","Zhōngguórén","중국인"],["最","zuì","가장"],["热闹","rènao","떠들썩하다 / 북적이다"],["出国","chūguó","외국에 나가다"],["旅游","lǚyóu","여행하다"],["怎么办","zěnme bàn","어떻게 하다"],["签证","qiānzhèng","비자"],["问问","wènwen","물어보다"],["办过","bàn guo","처리해 본 적 있다"],["朋友","péngyou","친구"],["或者","huòzhě","또는"],["打电话","dǎ diànhuà","전화를 걸다"],["大使馆","dàshǐguǎn","대사관"],["学习态度","xuéxí tàidu","학습 태도"],["改变","gǎibiàn","변화시키다"],["以后","yǐhòu","이후"],["通过考试","tōngguò kǎoshì","시험에 합격하다"],["更有信心","gèng yǒu xìnxīn","더 자신감이 있다"],["近年来","jìnnián lái","최근 몇 년간"],["随着","suízhe","~에 따라"],["科技","kējì","과학기술"],["发展","fāzhǎn","발전하다"],["打印机","dǎyìnjī","프린터"],["使用","shǐyòng","사용하다"],["受到影响","shòudào yǐngxiǎng","영향을 받다"],["传真机","chuánzhēnjī","팩스"],["越来越少","yuè lái yuè shǎo","갈수록 줄어들다"],["理想","lǐxiǎng","이상 / 꿈"],["律师","lǜshī","변호사"],["最终","zuìzhōng","최종적으로"],["成为","chéngwéi","~이 되다"],["警察","jǐngchá","경찰"],["因此","yīncǐ","그러므로"],["担心","dānxīn","걱정하다"],["安全","ānquán","안전"],["中华民族","Zhōnghuá mínzú","중화민족"],["共同语言","gòngtóng yǔyán","공통 언어"],["外国人","wàiguórén","외국인"],["好处","hǎochu","장점 / 이익"],["其中","qízhōng","그중"],["重要","zhòngyào","중요하다"],["顺利","shùnlì","순조롭다"],["交流","jiāoliú","교류하다"],["奖学金","jiǎngxuéjīn","장학금"],["四个学期","sì ge xuéqī","네 학기"],["著名","zhùmíng","유명하다"],["博士","bóshì","박사"],["全家人","quánjiārén","온 가족"],["骄傲","jiāo'ào","자랑스러워하다 / 거만하다"],["羽毛球","yǔmáoqiú","배드민턴"],["计划","jìhuà","계획"],["只好","zhǐhǎo","~할 수밖에 없다"],["改变计划","gǎibiàn jìhuà","계획을 변경하다"],["十分","shífēn","매우 / 충분히"],["分钟","fēnzhōng","분"],["打坏","dǎ huài","쳐서 망가뜨리다"],["早早","zǎozǎo","일찍이"],["起床","qǐchuáng","기상하다"],["行李","xíngli","짐 / 수하물"],["兴奋","xīngfèn","흥분하다 / 신나다"],["一夜","yí yè","하룻밤"],["睡觉","shuìjiào","잠자다"],["放假","fàngjià","방학하다 / 휴가를 주다"],["回家","huí jiā","귀가하다"],["没办法","méi bànfǎ","방법이 없다 / 어쩔 수 없다"],["女朋友","nǚ péngyou","여자친구"],["生日礼物","shēngrì lǐwù","생일 선물"],["银行卡","yínhángkǎ","은행 카드"],["只剩","zhǐ shèng","~만 남다"],["块钱","kuài qián","위안(구어체)"],["哥哥","gēge","형 / 오빠"],["转钱","zhuǎn qián","돈을 이체하다"],["打算","dǎsuàn","~할 계획이다"],["早点儿","zǎodiǎnr","좀 더 일찍"],["国内","guónèi","국내"],["较高","jiào gāo","비교적 높다"],["工作","gōngzuò","일 / 일하다"],["决定","juédìng","결정하다"],["放弃","fàngqì","포기하다"],["机会","jīhuì","기회"],["考虑到","kǎolǜ dào","~을 고려하다"],["家里","jiāli","집안"],["经济情况","jīngjì qíngkuàng","경제 사정"],["开车","kāichē","운전하다"],["耐心","nàixīn","인내심"],["节假日","jiéjiàrì","명절과 공휴일"],["高速公路","gāosù gōnglù","고속도로"],["免费","miǎnfèi","무료이다"],["堵车","dǔchē","교통체증"],["平时","píngshí","평소"],["严重","yánzhòng","심각하다"],["江苏省","Jiāngsū shěng","장쑤성"],["东部","dōngbù","동부"],["南京","Nánjīng","난징"],["苏州","Sūzhōu","쑤저우"],["中部","zhōngbù","중부"],["南方","nánfāng","남쪽 지역"],["北方","běifāng","북쪽 지역"],["气候","qìhòu","기후"],["特点","tèdiǎn","특징"],["长江","Cháng Jiāng","창장강 / 양쯔강"],["西部","xībù","서부"],["变化","biànhuà","변화하다 / 변화"],["特别是","tèbié shì","특히"],["肉类","ròulèi","육류"],["放盐","fàng yán","소금을 넣다"],["提醒","tíxǐng","일깨우다 / 주의를 주다"],["老人","lǎorén","노인"],["身体","shēntǐ","몸"],["不好","bù hǎo","좋지 않다"],["虽然","suīrán","비록 ~이지만"],["回答","huídá","대답하다"],["很快","hěn kuài","매우 빨리"],["忘了","wàng le","잊었다"],["做饭","zuò fàn","요리하다"],["味道","wèidào","맛 / 냄새"],["很咸","hěn xián","매우 짜다"],["几乎","jīhū","거의"],["天天","tiāntiān","매일"],["做汤","zuò tāng","국을 끓이다"],["一年前","yì nián qián","일 년 전"],["半年前","bàn nián qián","반년 전"],["活泼","huópo","활발하다"],["爱开玩笑","ài kāi wánxiào","농담을 좋아하다"],["害羞","hàixiū","부끄러워하다"],["脸红","liǎn hóng","얼굴이 빨개지다"],["不相信","bù xiāngxìn","믿지 않다"],["儿童","értóng","아동"],["国家","guójiā","국가"],["希望","xīwàng","희망하다 / 희망"],["调查","diàochá","조사하다"],["发现","fāxiàn","발견하다"],["身体情况","shēntǐ qíngkuàng","건강 상태"],["容易","róngyì","쉽다"],["生病","shēngbìng","병에 걸리다"],["除了","chúle","~을 제외하고"],["文化课","wénhuà kè","교과 수업"],["重视","zhòngshì","중시하다"],["体育课","tǐyù kè","체육 수업"],["养成习惯","yǎngchéng xíguàn","습관을 기르다"],["历史文化","lìshǐ wénhuà","역사 문화"],["医院","yīyuàn","병원"],["大学教授","dàxué jiàoshòu","대학교 교수"],["课程","kèchéng","수업 / 교육과정"],["提供","tígōng","제공하다"],["研究水平","yánjiū shuǐpíng","연구 수준"],["高质量","gāo zhìliàng","고품질"],["学生","xuésheng","학생"],["食堂","shítáng","구내식당 / 학생식당"],["留学生","liúxuéshēng","유학생"],["菜名","càimíng","음식 이름"],["只能","zhǐnéng","~할 수밖에 없다"],["手指","shǒuzhǐ","손가락"],["中文名字","Zhōngwén míngzi","중국어 이름"],["方便","fāngbiàn","편리하다"],["工作人员","gōngzuò rényuán","직원"],["判断","pànduàn","판단하다"],["干净","gānjìng","깨끗하다"],["舒服","shūfu","편안하다"],["短时间","duǎn shíjiān","짧은 시간"],["信息","xìnxī","정보"],["好感","hǎogǎn","호감"],["放松","fàngsōng","긴장을 풀다"],["吸引","xīyǐn","끌어들이다"],["阅读","yuèdú","읽다 / 독서"],["收入","shōurù","수입"],["火车站","huǒchēzhàn","기차역"],["汽车站","qìchēzhàn","버스터미널"],["周围","zhōuwéi","주변"],["城市","chéngshì","도시"],["纸地图","zhǐ dìtú","종이 지도"],["手机地图","shǒujī dìtú","휴대전화 지도"],["地点","dìdiǎn","장소"],["现金","xiànjīn","현금"],["护照","hùzhào","여권"],["法国","Fǎguó","프랑스"],["机场","jīchǎng","공항"],["行李箱","xínglixiāng","여행가방"],["超重","chāozhòng","중량 초과"],["扔掉","rēngdiào","버리다"],["着急","zháojí","초조하다 / 급하다"],["准备","zhǔnbèi","준비하다"],["礼物","lǐwù","선물"],["后悔","hòuhuǐ","후회하다"],["来不及","láibují","시간이 모자라다 / 늦다"],["教授","jiàoshòu","교수"],["八十多岁","bāshí duō suì","80여 세"],["尊重","zūnzhòng","존중하다"],["关键是","guānjiàn shì","핵심은 ~이다"],["专业课","zhuānyè kè","전공 수업"],["坚持阅读","jiānchí yuèdú","꾸준히 독서하다"],["实在","shízài","정말 / 참으로"],["这种","zhè zhǒng","이런 종류의"],["太苦了","tài kǔ le","너무 쓰다 / 고되다"],["巧克力","qiǎokèlì","초콜릿"],["表演","biǎoyǎn","공연하다 / 공연"],["是否","shìfǒu","~인지 아닌지"],["戴帽子","dài màozi","모자를 쓰다"],["散步","sànbù","산책하다"],["接回来","jiē huílái","데리고 돌아오다"],["孙子","sūnzi","손자"],["顺便","shùnbiàn","하는 김에"],["安排","ānpái","안배하다 / 계획을 짜다"],["学期","xuéqī","학기"],["非常满","fēicháng mǎn","매우 꽉 차 있다"],["禁止","jìnzhǐ","금지하다"],["图书馆","túshūguǎn","도서관"],["大声说话","dàshēng shuōhuà","큰 소리로 말하다"],["四川菜","Sìchuān cài","쓰촨 요리"],["辣","là","맵다"],["眼泪","yǎnlèi","눈물"],["登机","dēngjī","비행기에 탑승하다"],["距离","jùlí","거리 / ~로부터 떨어지다"],["半个小时","bàn ge xiǎoshí","30분"],["烦恼","fánnǎo","근심 / 고민"],["写作业","xiě zuòyè","숙제를 하다"],["亚洲国家","Yàzhōu guójiā","아시아 국가"],["来自","láizì","~에서 오다"],["主要","zhǔyào","주로 / 주요한"],["占线","zhànxiàn","전화가 통화 중이다"],["擦","cā","닦다"],["眼镜","yǎnjìng","안경"],["逛","guàng","구경하다 / 돌아다니다"],["份","fèn","부, 몫(양사)"],["网球","wǎngqiú","테니스"],["打网球","dǎ wǎngqiú","테니스를 치다"],["声音","shēngyīn","소리"],["缺水","quē shuǐ","물 부족"],["植物","zhíwù","식물"],["压力","yālì","압박 / 스트레스"],["减少","jiǎnshǎo","감소하다"],["入睡","rùshuì","잠들다"],["推迟","tuīchí","미루다 / 연기하다"],["睡觉前","shuìjiào qián","잠들기 전에"],["影响","yǐngxiǎng","영향을 주다"],["醒来","xǐnglái","잠에서 깨다"],["建议","jiànyì","제안하다 / 조언"],["左右","zuǒyòu","약 / ~정도"],["究竟","jiūjìng","도대체 / 결국"],["幸福","xìngfú","행복 / 행복하다"],["也许","yěxǔ","어쩌면"],["穷人","qióngrén","가난한 사람"],["花不完","huā bu wán","다 쓰지 못하다"],["标准答案","biāozhǔn dá'àn","모범답안"],["理解","lǐjiě","이해하다"],["复杂","fùzá","복잡하다"],["简单","jiǎndān","간단하다"],["感觉","gǎnjué","느낌 / 느끼다"],["用心","yòngxīn","정성을 들이다"],["寻找","xúnzhǎo","찾다"],["一定","yídìng","반드시 / 틀림없이"],["大小不同","dàxiǎo bùtóng","크기가 다르다"],["颜色不同","yánsè bùtóng","색깔이 다르다"],["好好学习","hǎohǎo xuéxí","열심히 공부하다"],["东北大学","Dōngběi Dàxué","둥베이대학교"],["毕业","bìyè","졸업하다"],["外国语专业","wàiguóyǔ zhuānyè","외국어 전공"],["国际交流","guójì jiāoliú","국제 교류"],["翻译","fānyì","번역하다"],["材料","cáiliào","자료 / 재료"],["帮忙","bāngmáng","도와주다"],["安排工作","ānpái gōngzuò","업무를 배정하다"],["介绍","jièshào","소개하다"],["新人","xīnrén","신입 직원"],["注意","zhùyì","주의하다"],["经常","jīngcháng","자주"],["吃不饱","chī bu bǎo","배불리 먹지 못하다"],["浪费时间","làngfèi shíjiān","시간을 낭비하다"],["流利","liúlì","유창하다"],["判断公司","pànduàn gōngsī","회사를 평가하다"],["产生好感","chǎnshēng hǎogǎn","호감을 갖게 되다"],["手机","shǒujī","휴대전화"],["快速","kuàisù","빠르다"],["不怕迷路","bú pà mílù","길 잃는 것을 두려워하지 않다"],["太着急","tài zháojí","너무 급하다"],["同学","tóngxué","급우 / 학우"],["能","néng","~할 수 있다"],["让","ràng","~하게 하다 / 시키다"],["把","bǎ","~을(목적어 앞에 쓰임)"],["被","bèi","~당하다 (피동)"],["得","de","정도보어를 연결하는 조사"],["了","le","완료 / 상태 변화를 나타내는 조사"],["的","de","관형어를 연결하는 조사"],["没","méi","~하지 않았다 / 없다"],["不","bù","~하지 않다"],["才","cái","비로소 / 겨우"],["就","jiù","곧 / 바로"],["比","bǐ","~보다 (비교)"],["因为","yīnwèi","왜냐하면 / ~때문에"],["所以","suǒyǐ","그래서"],["如果","rúguǒ","만약 ~라면"],["可以","kěyǐ","~할 수 있다 / 해도 된다"],["还","hái","아직 / 또한"],["都","dōu","모두"],["总","zǒng","항상 / 늘"],["只要","zhǐyào","~하기만 하면"],["终于","zhōngyú","마침내"],["却","què","오히려 / 그런데"],["并且","bìngqiě","그리고 / 게다가"],["不但","búdàn","~뿐만 아니라"],["不仅","bùjǐn","~뿐만 아니라"],["实际上","shíjì shàng","사실상"],["由于","yóuyú","~ 때문에"],["对","duì","~에 대해 / 맞다"],["关于","guānyú","~에 관하여"],["根据","gēnjù","~에 근거하여"],["让人","ràng rén","사람으로 하여금 ~하게 하다"],["效果","xiàoguǒ","효과"],["做好","zuò hǎo","잘 해내다"],["课堂","kètáng","교실 / 수업 시간"],["疲劳","píláo","피로"],["幸福感","xìngfúgǎn","행복감"]],"mock":[["材料","cáiliào","자료, 재료"],["翻译","fānyì","번역하다; 번역"],["博士","bóshì","박사"],["京剧","jīngjù","경극"],["唱","chàng","노래하다"],["一般","yìbān","보통, 일반적이다"],["公司","gōngsī","회사"],["工作","gōngzuò","일하다; 일"],["上班","shàngbān","출근하다, 근무하다"],["迟到","chídào","지각하다"],["机场","jīchǎng","공항"],["植物园","zhíwùyuán","식물원"],["花钱","huā qián","돈을 쓰다"],["考试","kǎoshì","시험"],["粗心","cūxīn","부주의하다, 덤벙대다"],["大学","dàxué","대학교"],["学习","xuéxí","공부하다"],["顾客","gùkè","고객, 손님"],["现金","xiànjīn","현금"],["购买","gòumǎi","구매하다"],["东西","dōngxi","물건, 것"],["特别","tèbié","특별히; 특별하다"],["贵","guì","비싸다"],["酸","suān","시다"],["比较","bǐjiào","비교적; 비교하다"],["新鲜","xīnxiān","신선하다"],["照片","zhàopiàn","사진"],["会议","huìyì","회의"],["信息","xìnxī","정보"],["安全","ānquán","안전하다; 안전"],["便宜","piányi","싸다"],["景色","jǐngsè","경치"],["方便","fāngbiàn","편리하다"],["火车站","huǒchēzhàn","기차역"],["礼貌","lǐmào","예의, 예의 바르다"],["个子","gèzi","키, 체격"],["说话","shuōhuà","말하다"],["耐心","nàixīn","인내심; 참을성 있다"],["出发","chūfā","출발하다"],["安排","ānpái","안배하다, 배정하다"],["爱好","àihào","취미, 좋아하다"],["麻烦","máfan","번거롭다; 폐, 문제"],["开车","kāichē","운전하다"],["走路","zǒulù","걷다"],["骑车","qíchē","자전거를 타다"],["地铁","dìtiě","지하철"],["害羞","hàixiū","부끄러워하다"],["胖","pàng","뚱뚱하다"],["性格","xìnggé","성격"],["价格","jiàgé","가격"],["网上","wǎngshàng","인터넷상에서"],["假的","jiǎ de","가짜인"],["质量","zhìliàng","품질"],["流行","liúxíng","유행하다; 유행하는"],["颜色","yánsè","색깔"],["深","shēn","깊다; (색이) 진하다"],["票","piào","표, 티켓"],["弄丢","nòngdiū","잃어버리다"],["来得及","láidejí","시간이 대다, 늦지 않다"],["走错","zǒucuò","길을 잘못 가다"],["银行","yínháng","은행"],["对面","duìmiàn","맞은편"],["附近","fùjìn","근처, 부근"],["邮局","yóujú","우체국"],["公园","gōngyuán","공원"],["南边","nánbian","남쪽"],["广播","guǎngbō","방송"],["钥匙","yàoshi","열쇠"],["修理","xiūlǐ","수리하다"],["传真机","chuánzhēnjī","팩스기"],["打扫","dǎsǎo","청소하다"],["会议室","huìyìshì","회의실"],["迷路","mílù","길을 잃다"],["手机","shǒujī","휴대전화"],["没电","méi diàn","배터리/전기가 없다"],["条","tiáo","가늘고 긴 것의 양사"],["加油站","jiāyóuzhàn","주유소"],["塑料袋","sùliàodài","비닐봉지, 비닐백"],["卫生间","wèishēngjiān","화장실"],["取款机","qǔkuǎnjī","현금인출기, ATM"],["电梯","diàntī","엘리베이터"],["餐厅","cāntīng","식당"],["教室","jiàoshì","교실"],["复印店","fùyìndiàn","복사점"],["太长","tài cháng","너무 길다"],["好玩儿","hǎowánr","재미있다"],["内容","nèiróng","내용"],["用词","yòngcí","단어 사용, 어휘 선택"],["合适","héshì","알맞다, 적합하다"],["夫妻","fūqī","부부"],["同事","tóngshì","동료"],["师生","shīshēng","교사와 학생"],["同学","tóngxué","학우, 반 친구"],["凉水","liángshuǐ","찬물"],["牛奶","niúnǎi","우유"],["红酒","hóngjiǔ","레드와인"],["奶茶","nǎichá","밀크티"],["缺少","quēshǎo","부족하다"],["信心","xìnxīn","자신감"],["经验","jīngyàn","경험"],["丰富","fēngfù","풍부하다"],["应该","yīnggāi","~해야 한다"],["赢","yíng","이기다"],["羽毛球","yǔmáoqiú","배드민턴"],["整理","zhěnglǐ","정리하다"],["房间","fángjiān","방"],["成功","chénggōng","성공하다; 성공"],["请假","qǐngjià","휴가/결근을 신청하다"],["报名","bàomíng","신청하다, 등록하다"],["律师","lǜshī","변호사"],["校长","xiàozhǎng","교장"],["售货员","shòuhuòyuán","판매원"],["门票","ménpiào","입장권"],["值得","zhíde","~할 가치가 있다"],["租房","zūfáng","집을 임대하다/세내다"],["新闻","xīnwén","뉴스"],["检查","jiǎnchá","검사하다"],["身体","shēntǐ","몸, 신체"],["运动","yùndòng","운동"],["电影院","diànyǐngyuàn","영화관"],["体育场","tǐyùchǎng","운동장, 경기장"],["高温","gāowēn","고온"],["大雨","dàyǔ","큰비, 폭우"],["暖和","nuǎnhuo","따뜻하다"],["空气","kōngqì","공기"],["影响","yǐngxiǎng","영향을 주다; 영향"],["家具","jiājù","가구"],["调查","diàochá","조사하다; 조사"],["邻居","línjū","이웃"],["聊天","liáotiān","이야기하다, 수다 떨다"],["大小","dàxiǎo","크기"],["顺利","shùnlì","순조롭다"],["毕业","bìyè","졸업하다"],["研究生","yánjiūshēng","대학원생"],["收入","shōurù","수입"],["满意","mǎnyì","만족하다"],["轻松","qīngsōng","편안하다, 부담이 적다"],["失望","shīwàng","실망하다"],["烦恼","fánnǎo","고민하다; 고민"],["感动","gǎndòng","감동하다"],["快乐","kuàilè","즐겁다, 행복하다"],["水分","shuǐfèn","수분"],["动物","dòngwù","동물"],["允许","yǔnxǔ","허락하다"],["照相","zhàoxiàng","사진을 찍다"],["开花","kāihuā","꽃이 피다"],["叶子","yèzi","잎"],["掉","diào","떨어지다"],["普遍","pǔbiàn","보편적이다"],["发展","fāzhǎn","발전하다"],["重视","zhòngshì","중시하다"],["任何","rènhé","어떠한 ~도"],["问题","wèntí","문제"],["危险","wēixiǎn","위험하다"],["社会","shèhuì","사회"],["帮助","bāngzhù","돕다; 도움"],["老人","lǎorén","노인"],["抱歉","bàoqiàn","미안하다"],["至少","zhìshǎo","적어도"],["地球","dìqiú","지구"],["坚持","jiānchí","견지하다, 꾸준히 하다"],["总结","zǒngjié","정리하다, 총결하다"],["共同","gòngtóng","공동의; 함께"],["过年","guònián","설을 쇠다, 새해를 보내다"],["大会","dàhuì","대회, 큰 회의"],["保护","bǎohù","보호하다"],["环境","huánjìng","환경"],["责任","zérèn","책임"],["十分","shífēn","매우, 충분히"],["每天","měitiān","매일"],["散步","sànbù","산책하다"],["小时","xiǎoshí","시간(단위)"],["打羽毛球","dǎ yǔmáoqiú","배드민턴을 치다"],["后悔","hòuhuǐ","후회하다"],["对于","duìyú","~에 대하여"],["温度","wēndù","온도"],["专业","zhuānyè","전공; 전문적인"],["遍","biàn","번, 회(처음부터 끝까지)"],["讲","jiǎng","말하다, 설명하다"],["明白","míngbai","이해하다; 분명하다"],["经济学","jīngjìxué","경제학"],["成绩","chéngjì","성적"],["讨论","tǎolùn","토론하다"],["垃圾","lājī","쓰레기"],["解决","jiějué","해결하다"],["减肥","jiǎnféi","다이어트하다"],["加班","jiābān","야근하다, 초과근무하다"],["情况","qíngkuàng","상황"],["超过","chāoguò","넘다, 초과하다"],["爷爷","yéye","할아버지"],["奶奶","nǎinai","할머니"],["接送","jiēsòng","마중하고 데려다주다"],["分店","fēndiàn","지점, 분점"],["做生意","zuò shēngyi","장사하다, 사업하다"],["不错","búcuò","괜찮다, 훌륭하다"],["将来","jiānglái","앞으로, 장래"],["打算","dǎsuàn","계획하다; 계획"],["城市","chéngshì","도시"],["果汁","guǒzhī","과일주스"],["建议","jiànyì","제안하다; 제안"],["直接","zhíjiē","직접; 곧바로"],["味道","wèidào","맛, 냄새"],["烤鸭","kǎoyā","베이징식 오리구이"],["长城","chángchéng","만리장성"],["暑假","shǔjià","여름방학"],["决定","juédìng","결정하다"],["超市","chāoshì","슈퍼마켓"],["商场","shāngchǎng","쇼핑몰, 백화점"],["免费","miǎnfèi","무료"],["节约","jiéyuē","절약하다"],["工资","gōngzī","급여, 임금"],["不舒服","bù shūfu","몸이 불편하다"],["帮忙","bāngmáng","돕다"],["老师","lǎoshī","선생님"],["详细","xiángxì","상세하다"],["开会","kāihuì","회의하다"],["酒店","jiǔdiàn","호텔"],["离","lí","~에서 떨어져 있다"],["需要","xūyào","필요하다"],["分钟","fēnzhōng","분"],["前台","qiántái","프런트, 안내 데스크"],["姓","xìng","성씨가 ~이다"],["恐怕","kǒngpà","아마 ~일 것이다; 걱정스럽게도"],["离开","líkāi","떠나다"],["地址","dìzhǐ","주소"],["理解","lǐjiě","이해하다"],["千万","qiānwàn","절대로, 꼭(강한 당부)"],["生气","shēngqì","화내다"],["幽默","yōumò","유머러스하다; 유머"],["爱开玩笑","ài kāi wánxiào","농담하기를 좋아하다"],["讨厌","tǎoyàn","싫어하다; 밉다"],["尽管","jǐnguǎn","비록 ~이지만"],["开始","kāishǐ","시작하다"],["输","shū","지다"],["乒乓球","pīngpāngqiú","탁구"],["比赛","bǐsài","경기, 시합"],["紧张","jǐnzhāng","긴장하다"],["精彩","jīngcǎi","멋지다, 훌륭하다"],["球员","qiúyuán","선수"],["观众","guānzhòng","관중"],["最近","zuìjìn","최근"],["交通","jiāotōng","교통"],["美丽","měilì","아름답다"],["生活水平","shēnghuó shuǐpíng","생활 수준"],["提高","tígāo","높이다, 향상시키다"],["旅游场所","lǚyóu chǎngsuǒ","관광 장소"],["吸引","xīyǐn","끌어당기다, 유치하다"],["国内外","guónèiwài","국내외"],["游客","yóukè","관광객"],["广告","guǎnggào","광고"],["往往","wǎngwǎng","흔히, 종종"],["看起来","kànqǐlái","~해 보이다"],["一定","yídìng","반드시; 꼭"],["比如","bǐrú","예를 들면"],["饮料","yǐnliào","음료"],["水果","shuǐguǒ","과일"],["其他","qítā","기타, 다른"],["聪明","cōngming","똑똑하다"],["随便","suíbiàn","마음대로, 함부로"],["放弃","fàngqì","포기하다"],["努力","nǔlì","노력하다"],["直到","zhídào","~까지"],["态度","tàidu","태도"],["重要","zhòngyào","중요하다"],["获得","huòdé","얻다, 획득하다"],["数字","shùzì","숫자"],["排列","páiliè","배열하다"],["空着","kòngzhe","비어 있다"],["原因","yuányīn","원인, 이유"],["专业书","zhuānyèshū","전문 서적"],["骗人","piànrén","사람을 속이다"],["体育考试","tǐyù kǎoshì","체육 시험"],["进行","jìnxíng","진행하다"],["准备","zhǔnbèi","준비하다"],["运动服","yùndòngfú","운동복"],["运动鞋","yùndòngxié","운동화"],["重新","chóngxīn","다시, 새로"],["时间","shíjiān","시간"],["地点","dìdiǎn","장소"],["导游","dǎoyóu","가이드"],["行李","xíngli","짐, 수하물"],["休息","xiūxi","쉬다, 휴식하다"],["带","dài","데리고 가다; 가지고 가다"],["吃饭","chīfàn","밥을 먹다"],["表演","biǎoyǎn","공연하다; 공연"],["收拾","shōushi","정리하다, 챙기다"],["篮球赛","lánqiúsài","농구 경기"],["半场","bànchǎng","전/후반 한 구간"],["中间","zhōngjiān","중간"],["按照","ànzhào","~에 따라"],["规定","guīdìng","규정; 규정하다"],["加时赛","jiāshísài","연장전"],["保修期","bǎoxiūqī","보증 수리 기간"],["材料费","cáiliàofèi","재료비"],["服务费","fúwùfèi","서비스 요금"],["人生","rénshēng","인생"],["机会","jīhuì","기회"],["接受","jiēshòu","받아들이다"],["改变","gǎibiàn","바꾸다, 변화시키다"],["选择","xuǎnzé","선택하다"],["购物","gòuwù","쇼핑하다"],["打折","dǎzhé","할인하다"],["八折","bā zhé","20% 할인, 정가의 80%"],["逛","guàng","구경하며 돌아다니다"],["国际会议","guójì huìyì","국제회의"],["交流","jiāoliú","교류하다"],["互联网","hùliánwǎng","인터넷"],["技术","jìshù","기술"],["大使馆","dàshǐguǎn","대사관"],["签证","qiānzhèng","비자"],["研究者","yánjiūzhě","연구자"],["语言","yǔyán","언어"],["周围","zhōuwéi","주위, 주변"],["语言环境","yǔyán huánjìng","언어 환경"],["儿童","értóng","아동, 어린이"],["即使","jíshǐ","비록 ~일지라도"],["母语","mǔyǔ","모국어"],["使用","shǐyòng","사용하다"],["同时","tóngshí","동시에"],["严重","yánzhòng","심각하다"],["污染","wūrǎn","오염시키다; 오염"],["完全","wánquán","완전히"],["禁止","jìnzhǐ","금지하다"],["积极","jījí","적극적이다"],["研究","yánjiū","연구하다"],["新技术","xīn jìshù","신기술"],["减少","jiǎnshǎo","감소시키다, 줄이다"],["爬山","páshān","등산하다"],["发现","fāxiàn","발견하다"],["越…越…","yuè…yuè…","~할수록 더욱 ~하다"],["植物","zhíwù","식물"],["越来越","yuèláiyuè","점점 더"],["冷","lěng","춥다, 차갑다"],["增加","zēngjiā","증가하다"],["气温","qìwēn","기온"],["降低","jiàngdī","낮추다, 내려가다"],["冰雪","bīngxuě","얼음과 눈"],["山区","shānqū","산악 지역"],["旅游","lǚyóu","여행하다"],["阅读","yuèdú","읽다, 독서"],["重要性","zhòngyàoxìng","중요성"],["理由","lǐyóu","이유"],["拒绝","jùjué","거절하다"],["读书","dúshū","책을 읽다"],["清楚","qīngchu","분명하다, 명확하다"],["成为","chéngwéi","~이 되다"],["什么样","shénmeyàng","어떤 모양/종류의"],["花时间","huā shíjiān","시간을 들이다"],["过去","guòqù","과거; 지나가다"],["提供","tígōng","제공하다"],["如今","rújīn","오늘날, 지금"],["能力","nénglì","능력"],["别人","biérén","다른 사람"],["某些","mǒuxiē","어떤, 몇몇"],["牛人","niúrén","대단한 사람, 고수(구어)"],["厉害","lìhai","대단하다, 뛰어나다"],["艺术","yìshù","예술"],["新意思","xīn yìsi","새로운 의미"],["继续","jìxù","계속하다"],["还得","hái děi","또/여전히 ~해야 한다"],["今天","jīntiān","오늘"],["看演出","kàn yǎnchū","공연을 보다"],["比昨天","bǐ zuótiān","어제보다"],["把","bǎ","목적어를 앞세우는 把 구문 표지"],["一下","yíxià","잠깐, 한번"],["客厅","kètīng","거실"],["要求","yāoqiú","요구하다; 요구"],["小伙子","xiǎohuǒzi","젊은 남자, 청년"],["生活经验","shēnghuó jīngyàn","생활 경험"],["演员","yǎnyuán","배우"],["镜子","jìngzi","거울"],["打扮","dǎban","꾸미다, 단장하다"],["母亲","mǔqīn","어머니"],["矿泉水","kuàngquánshuǐ","생수, 광천수"],["水瓶","shuǐpíng","물병"],["垃圾桶","lājītǒng","쓰레기통"],["寒冷","hánlěng","매우 춥다"],["一年四季","yìnián sìjì","사계절 내내"],["气候","qìhòu","기후"],["上课内容","shàngkè nèiróng","수업 내용"],["认真","rènzhēn","성실하다, 진지하다"],["复习","fùxí","복습하다"],["连…都…","lián…dōu…","심지어 ~조차도"],["讲清楚","jiǎng qīngchu","분명하게 설명하다"],["一句话","yí jù huà","한마디, 한 문장"],["醒","xǐng","깨다, 잠에서 깨다"],["干杯","gānbēi","건배하다; 건배"],["棒","bàng","훌륭하다, 최고다"]]};
+</script>
+<script src="config.js"></script>
+<script>
+"use strict";
+/* ---------- 유틸 ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const strip=s=>String(s).normalize("NFD").replace(/[̀-ͯ\s']/g,"").toLowerCase();
+function sha256(s){s=unescape(encodeURIComponent(s));const rr=(v,a)=>(v>>>a)|(v<<(32-a));const mp=Math.pow,mw=mp(2,32);let res="";const w=[],bl=s.length*8;let H=sha256.h=sha256.h||[];const K=sha256.k=sha256.k||[];let pc=K.length;const comp={};
+  for(let c=2;pc<64;c++){if(!comp[c]){for(let i=0;i<313;i+=c)comp[i]=c;H[pc]=(mp(c,.5)*mw)|0;K[pc++]=(mp(c,1/3)*mw)|0}}
+  s+="\x80";while(s.length%64-56)s+="\x00";for(let i=0;i<s.length;i++){const j=s.charCodeAt(i);w[i>>2]|=j<<((3-i)%4)*8}
+  w[w.length]=(bl/mw)|0;w[w.length]=bl;
+  for(let j=0;j<w.length;){const W=w.slice(j,j+=16),old=H;H=H.slice(0,8);
+    for(let i=0;i<64;i++){const w15=W[i-15],w2=W[i-2],a=H[0],e=H[4];
+      const t1=H[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&H[5])^(~e&H[6]))+K[i]+(W[i]=i<16?W[i]:(W[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+W[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+      const t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&H[1])^(a&H[2])^(H[1]&H[2]));H=[(t1+t2)|0].concat(H);H[4]=(H[4]+t1)|0}
+    for(let i=0;i<8;i++)H[i]=(H[i]+old[i])|0}
+  for(let i=0;i<8;i++)for(let j=3;j+1;j--){const b=(H[i]>>(j*8))&255;res+=(b<16?"0":"")+b.toString(16)}return res}
+const pinHash=(name,pin)=>sha256("hsk|"+name+"|"+pin);
+
+/* ---------- 브라우저 저장 (로컬 모드 + 로그인 유지) ---------- */
+const mem={};
+const LS={get(k,d){if(k in mem)return mem[k];try{const v=localStorage.getItem(k);if(v!=null)return mem[k]=JSON.parse(v)}catch(e){}return d},
+  set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast("브라우저 저장 공간에 저장하지 못했어요")}},
+  del(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}};
+const COLORS=["#007aff","#34c759","#ff9500","#af52de","#ff2d55","#5ac8fa","#ffcc00","#a2845e"];
+
+/* =====================================================================
+   데이터 계층 — config.js 에 Supabase 주소·키가 있으면 서버, 없으면 이 브라우저(로컬 모드)
+   ===================================================================== */
+const CFG=window.HSK_CONFIG||{};
+const REMOTE=!!(CFG.supabaseUrl&&CFG.supabaseKey);
+
+/* 로컬 모드: 시안과 같은 저장 형식 (hsk.users / hsk.decks / hsk.p.<uid> / hsk.s.<uid>) */
+const Local={
+  seed(){if(!LS.get("hsk.users"))LS.set("hsk.users",{u1:{name:"이정빈",pin:pinHash("이정빈","7052"),created:today()}});
+    if(!LS.get("hsk.decks"))LS.set("hsk.decks",[{id:"hsk3",name:"HSK 3급",color:"#34c759",words:[]},{id:"hsk4",name:"HSK 4급",color:"#007aff",words:SEED.hsk4},{id:"mock",name:"실전모의고사",color:"#ff9500",words:SEED.mock},{id:"hak45",name:"학원 4-5급",color:"#af52de",words:[]}])},
+  uid:tk=>String(tk).replace(/^local:/,""),
+  list(uid){const p=LS.get("hsk.p."+uid,{});return LS.get("hsk.decks",[]).map(d=>{const q=p[d.id]||{};let dn=0,xn=0;d.words.forEach(w=>{const s=q[w[0]];if(s){if(s.d)dn++;if(s.x)xn++}});return{id:d.id,name:d.name,color:d.color,n:d.words.length,dn,xn}})},
+  decksRaw:()=>LS.get("hsk.decks",[]),
+  async users(){return Object.entries(LS.get("hsk.users",{})).map(([id,u])=>({id,name:u.name}))},
+  async login(uid,pin){const u=LS.get("hsk.users",{})[uid];if(!u)return{error:"NOUSER"};return u.pin===pinHash(u.name,pin)?{token:"local:"+uid,uid}:{error:"PIN"}},
+  async signup(name,pin){const us=LS.get("hsk.users",{});if(Object.values(us).some(u=>u.name===name))throw new Error("NAME_TAKEN");const id="u"+Date.now().toString(36);us[id]={name,pin:pinHash(name,pin),created:today()};LS.set("hsk.users",us);return{token:"local:"+id,uid:id}},
+  async logout(){},
+  async state(tk){const uid=this.uid(tk),u=LS.get("hsk.users",{})[uid];if(!u)throw new Error("AUTH");return{user:{id:uid,name:u.name,admin:true,created:u.created},settings:LS.get("hsk.s."+uid,{}),decks:this.list(uid)}},
+  async deck(tk,id){const d=this.decksRaw().find(x=>x.id===id);return{words:d?d.words:[],prog:(LS.get("hsk.p."+this.uid(tk),{})[id])||{}}},
+  async saveProgress(tk,id,items){const k="hsk.p."+this.uid(tk),p=LS.get(k,{});p[id]=Object.assign(p[id]||{},items);LS.set(k,p)},
+  async clearProgress(tk,id){const k="hsk.p."+this.uid(tk),p=LS.get(k,{});delete p[id];LS.set(k,p)},
+  async saveSettings(tk,data){LS.set("hsk.s."+this.uid(tk),data)},
+  async deckCreate(tk,name,color){const ds=this.decksRaw();const id="d"+Date.now().toString(36);ds.push({id,name,color,words:[]});LS.set("hsk.decks",ds);return{id,decks:this.list(this.uid(tk))}},
+  async deckRename(tk,id,name){const ds=this.decksRaw();const d=ds.find(x=>x.id===id);if(d)d.name=name;LS.set("hsk.decks",ds);return this.list(this.uid(tk))},
+  async deckDelete(tk,id){LS.set("hsk.decks",this.decksRaw().filter(x=>x.id!==id));return this.list(this.uid(tk))},
+  async deckClear(tk,id){const ds=this.decksRaw();const d=ds.find(x=>x.id===id);if(d)d.words=[];LS.set("hsk.decks",ds);return this.list(this.uid(tk))},
+  async putWords(tk,id,words,replace){const ds=this.decksRaw();const d=ds.find(x=>x.id===id);if(!d)throw new Error("NODECK");const base=replace?[]:d.words;const r=WP.dedupe(words,base.map(w=>w[0]));d.words=base.concat(r.words);LS.set("hsk.decks",ds);return{added:r.words.length,dup:r.dup,decks:this.list(this.uid(tk))}}
+};
+
+/* 서버 모드: Supabase RPC (supabase/schema.sql 의 hsk_* 함수) */
+async function rpc(fn,args){
+  const headers={"Content-Type":"application/json",apikey:CFG.supabaseKey};
+  if(/^eyJ/.test(CFG.supabaseKey))headers.Authorization="Bearer "+CFG.supabaseKey;
+  let r;try{r=await fetch(String(CFG.supabaseUrl).replace(/\/+$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers,body:JSON.stringify(args||{})})}
+  catch(e){throw new Error("NET")}
+  const txt=await r.text();let j=null;try{j=txt?JSON.parse(txt):null}catch(e){}
+  if(!r.ok)throw new Error((j&&j.message)||("HTTP "+r.status));
+  return j}
+const Remote={
+  async users(){return (await rpc("hsk_users"))||[]},
+  login:(uid,pin)=>rpc("hsk_login",{p_uid:uid,p_pin:pin}),
+  signup:(n,p)=>rpc("hsk_signup",{p_name:n,p_pin:p}),
+  async logout(tk){try{await rpc("hsk_logout",{p_token:tk})}catch(e){}},
+  state:tk=>rpc("hsk_state",{p_token:tk}),
+  deck:(tk,id)=>rpc("hsk_deck",{p_token:tk,p_deck:id}),
+  saveProgress:(tk,id,items)=>rpc("hsk_save_progress",{p_token:tk,p_deck:id,p_items:items}),
+  clearProgress:(tk,id)=>rpc("hsk_clear_progress",{p_token:tk,p_deck:id}),
+  saveSettings:(tk,d)=>rpc("hsk_save_settings",{p_token:tk,p_data:d}),
+  deckCreate:(tk,n,c)=>rpc("hsk_deck_create",{p_token:tk,p_name:n,p_color:c}),
+  deckRename:(tk,id,n)=>rpc("hsk_deck_rename",{p_token:tk,p_deck:id,p_name:n}),
+  deckDelete:(tk,id)=>rpc("hsk_deck_delete",{p_token:tk,p_deck:id}),
+  deckClear:(tk,id)=>rpc("hsk_deck_clear",{p_token:tk,p_deck:id}),
+  putWords:(tk,id,w,r)=>rpc("hsk_deck_put_words",{p_token:tk,p_deck:id,p_words:w,p_replace:!!r})
+};
+const DB=REMOTE?Remote:Local;
+const ERR={NET:"서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.",AUTH:"로그인이 만료됐어요. 다시 로그인해 주세요.",ADMIN:"서랍 관리는 관리자만 할 수 있어요.",
+  NAME_TAKEN:"같은 이름의 계정이 이미 있어요. 다른 이름을 써 주세요.",NAME:"이름을 1~20자로 입력해 주세요.",PINFMT:"암호는 숫자 4자리로 정해 주세요.",NODECK:"서랍을 찾지 못했어요.",
+  PIN:"암호가 맞지 않아요",LOCKED:"5번 틀려서 5분 동안 잠겼어요",NOUSER:"계정을 찾지 못했어요"};
+const errText=e=>{const m=String(e&&e.message||e);return ERR[m]||("문제가 생겼어요: "+m)};
+/* 로그인 토큰을 붙여 호출하고, 만료되면 로그인 화면으로 */
+async function call(fn,...args){try{return await DB[fn](A.token,...args)}
+  catch(e){if(String(e.message)==="AUTH"){LS.del("hsk.session");showLogin();}toast(errText(e));throw e}}
+async function busy(p,msg){let t=setTimeout(()=>toast(msg||"불러오는 중…"),350);try{return await p}finally{clearTimeout(t)}}
+
+/* ---------- 앱 상태 ---------- */
+const A={token:null,uid:null,user:null,set:null,decks:[],deck:{id:"none",name:"",words:[]},prog:{},words:[],view:"ios"};
+const EMPTY={};
+const Pg=w=>A.prog[w.han]||EMPTY;
+const P=w=>A.prog[w.han]||(A.prog[w.han]={});
+const isAdmin=()=>!!(A.user&&A.user.admin);
+const per=()=>A.set.perDay;
+const nDays=()=>Math.max(1,Math.ceil(A.words.length/per()));
+const dayOf=w=>Math.floor(w.i/per())+1;
+const dayWords=k=>A.words.slice((k-1)*per(),k*per());
+/* 진도 저장: 바뀐 단어만 모아 잠시 뒤 한 번에 보냄 */
+let dirty={},flushT=null,flushing=null,failNoted=false;
+function queue(w){const id=A.deck.id;(dirty[id]=dirty[id]||{})[w.han]=Object.assign({d:0,x:0,c:0,t:"",m:""},A.prog[w.han]);clearTimeout(flushT);flushT=setTimeout(flush,REMOTE?700:0)}
+async function flush(){clearTimeout(flushT);if(flushing)await flushing;const batch=dirty;dirty={};const ids=Object.keys(batch);if(!ids.length)return;
+  flushing=(async()=>{for(const id of ids){try{await DB.saveProgress(A.token,id,batch[id]);failNoted=false}
+    catch(e){dirty[id]=Object.assign(batch[id],dirty[id]||{});if(String(e.message)==="AUTH"){LS.del("hsk.session");showLogin();toast(ERR.AUTH);return}
+      if(!failNoted){toast("진도를 아직 저장하지 못했어요. 연결되면 다시 보낼게요.");failNoted=true}clearTimeout(flushT);flushT=setTimeout(flush,6000)}}})();
+  await flushing;flushing=null}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flush()});
+window.addEventListener("pagehide",()=>flush());
+let setT=null;
+function saveSet(){if(!A.token)return;clearTimeout(setT);setT=setTimeout(()=>DB.saveSettings(A.token,A.set).catch(()=>{}),REMOTE?1200:0)}
+const touch=w=>{const s=P(w);s.c=(s.c||0)+1;s.t=today()};
+function mark(w,kind){const s=P(w);s.d=kind==="d"?1:0;s.x=kind==="x"?1:0;if(kind)touch(w);queue(w)}
+function touchSave(w){touch(w);queue(w)}
+function setMemo(w,m){P(w).m=m;queue(w)}
+const dayDone=k=>{const ws=dayWords(k);return ws.length>0&&ws.every(w=>Pg(w).d)};
+function deckStats(d){if(d.id===A.deck.id){let dn=0,xn=0;A.words.forEach(w=>{const s=Pg(w);if(s.d)dn++;if(s.x)xn++});return{n:A.words.length,d:dn,x:xn}}return{n:d.n||0,d:d.dn||0,x:d.xn||0}}
+function syncMeta(){const m=A.decks.find(d=>d.id===A.deck.id);if(m){const s=deckStats(A.deck);m.n=s.n;m.dn=s.d;m.xn=s.x}}
+
+/* ---------- 효과음 · 발음 ---------- */
+let AC=null;
+function ac(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();return AC}catch(e){return null}}
+function tone(fs,type,gap,vol,len){if(!A.set||!A.set.sound)return;const a=ac();if(!a)return;let t=a.currentTime+.01;
+  fs.forEach(f=>{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0008,t+len);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+len+.05);t+=gap})}
+const ding=()=>{tone([1318.5,1760],"sine",.12,.22,.55);try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+const dung=()=>{tone([440,330],"triangle",.13,.25,.4);try{navigator.vibrate&&navigator.vibrate([10,40,10])}catch(e){}};
+let zhVoice=null;function pickVoice(){try{const v=speechSynthesis.getVoices();zhVoice=v.find(x=>/zh[-_]CN/i.test(x.lang))||v.find(x=>/^zh/i.test(x.lang))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="zh-CN";u.rate=.85;if(zhVoice)u.voice=zhVoice;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- 토스트 · 오버레이 ---------- */
+let toastT=null;
+function toast(msg){const t=$("toast");t.textContent=msg;t.className="toast "+(A.view==="erp"&&A.token?"erp":"");t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
+let ovClose=null;
+function modal(title,html,onClose){const o=$("ov");o.className="ov "+(A.view==="erp"&&A.token?"erp":"ios");$("ovT").textContent=title;$("ovB").innerHTML=html;o.hidden=false;ovClose=onClose||null;$("ovB").scrollTop=0}
+function closeModal(){$("ov").hidden=true;Q=null;const f=ovClose;ovClose=null;f&&f()}
+$("ovX").onclick=closeModal;$("ov").addEventListener("click",e=>{if(e.target.id==="ov")closeModal()});
+
+/* ---------- 로그인 ---------- */
+let pinUser=null,pinBuf="",pinBusy=false;
+async function showLogin(){A.token=null;A.uid=null;$("ios").hidden=$("erp").hidden=true;$("ov").hidden=true;$("login").hidden=false;$("lList").hidden=false;$("lPin").hidden=true;
+  $("lUsers").innerHTML=`<div class="li" style="color:var(--sec)">계정 불러오는 중…</div>`;
+  let us=[];try{us=await DB.users()}catch(e){$("lUsers").innerHTML=`<div class="li" style="color:var(--red)">${esc(errText(e))}</div>`;return}
+  $("lUsers").innerHTML=us.map(u=>`<button class="li tap ind" data-uid="${esc(u.id)}" data-name="${esc(u.name)}"><span class="avatar">${esc(u.name.slice(0,1))}</span><span class="grow">${esc(u.name)}${REMOTE?"":`<small>${progressLine(u.id)}</small>`}</span><span class="chev">›</span></button>`).join("")||`<div class="li" style="color:var(--sec)">아직 계정이 없어요. 새 계정을 만들어 주세요.</div>`}
+function progressLine(uid){const p=LS.get("hsk.p."+uid,{});let d=0;Object.values(p).forEach(dk=>Object.values(dk).forEach(s=>{if(s.d)d++}));return d?`외운 단어 ${d}개`:"아직 학습 기록 없음"}
+$("lUsers").onclick=e=>{const b=e.target.closest("[data-uid]");if(!b)return;pinUser={id:b.dataset.uid,name:b.dataset.name};pinBuf="";
+  $("pAva").textContent=pinUser.name.slice(0,1);$("pName").textContent=pinUser.name;$("pMsg").textContent="";drawDots();$("lList").hidden=true;$("lPin").hidden=false};
+$("pPad").innerHTML=["1","2|ABC","3|DEF","4|GHI","5|JKL","6|MNO","7|PQRS","8|TUV","9|WXYZ","취소","0","지우기"].map(k=>{const[n,s]=k.split("|");return `<button class="key ${n.length>1?"txt":""}" data-k="${n}">${n}${s?`<small>${s}</small>`:""}</button>`}).join("");
+function drawDots(){[...$("pDots").children].forEach((d,i)=>d.classList.toggle("on",i<pinBuf.length))}
+function pinFail(msg){pinBuf="";const d=$("pDots");d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");drawDots();$("pMsg").textContent=msg}
+async function pinKey(k){if(pinBusy)return;if(k==="취소"){showLogin();return}if(k==="지우기"){pinBuf=pinBuf.slice(0,-1);drawDots();return}
+  if(pinBuf.length>=4)return;pinBuf+=k;drawDots();$("pMsg").textContent="";
+  if(pinBuf.length===4){pinBusy=true;try{const r=await DB.login(pinUser.id,pinBuf);if(r&&r.token)await enterSession(r.token);else pinFail(ERR[r&&r.error]||ERR.PIN)}
+    catch(e){pinFail(errText(e))}finally{pinBusy=false}}}
+$("pPad").onclick=e=>{const b=e.target.closest("[data-k]");if(b)pinKey(b.dataset.k)};
+$("lNew").onclick=()=>openSignup();
+function openSignup(){modal("새 계정",`<span class="lbl">이름</span><input class="inp" id="suName" autocomplete="off" maxlength="20" placeholder="예: 홍길동">
+  <span class="lbl">암호 (숫자 4자리)</span><input class="inp" id="suPin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+  <span class="lbl">암호 확인</span><input class="inp" id="suPin2" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+  <div class="note" id="suMsg">진도는 계정마다 따로 저장돼요.${REMOTE?" 어느 기기에서 로그인해도 이어서 볼 수 있어요.":" 지금은 이 기기의 브라우저에만 저장됩니다."}</div>
+  <button class="btn pri blk" id="suGo">계정 만들고 시작하기</button>`);
+  setTimeout(()=>$("suName").focus(),50);
+  $("suGo").onclick=async()=>{const n=$("suName").value.trim(),p=$("suPin").value,p2=$("suPin2").value,msg=$("suMsg");
+    if(!n){msg.textContent=ERR.NAME;return}if(!/^\d{4}$/.test(p)){msg.textContent=ERR.PINFMT;return}if(p!==p2){msg.textContent="암호 확인이 다르게 입력됐어요.";return}
+    $("suGo").disabled=true;try{await flush();const r=await DB.signup(n,p);closeModal();await enterSession(r.token);toast(n+"님 계정을 만들었어요")}
+    catch(e){msg.textContent=errText(e);$("suGo").disabled=false}}}
+async function enterSession(token){const st=await DB.state(token);
+  A.token=token;A.uid=st.user.id;A.user=st.user;A.decks=st.decks||[];
+  A.set=Object.assign({perDay:30,deck:"hsk4",mask:{h:0,p:0,m:0},view:"ios",pos:{},sound:1,auto:0,filter:"all",dir:"h2k"},st.settings||{});
+  A.set.mask=Object.assign({h:0,p:0,m:0},A.set.mask);A.set.pos=A.set.pos||{};
+  LS.set("hsk.session",{token,remote:REMOTE});$("login").hidden=true;
+  await openDeck(A.set.deck);show(A.set.view)}
+async function logout(){await flush();const tk=A.token;LS.del("hsk.session");closeModal();DB.logout(tk);showLogin()}
+
+/* ---------- 서랍 ---------- */
+async function openDeck(id){await flush();const meta=A.decks.find(d=>d.id===id)||A.decks[0];
+  if(!meta){A.deck={id:"none",name:"서랍 없음",words:[]};A.prog={}}
+  else{const r=await busy(call("deck",meta.id));A.deck=Object.assign({},meta,{words:r.words||[]});A.prog=r.prog||{}}
+  A.set.deck=A.deck.id;A.words=A.deck.words.map((w,i)=>({i,no:i+1,han:w[0],py:w[1]||"",mn:w[2]||""}));syncMeta();
+  const pos=A.set.pos[A.deck.id];M.day=pos&&pos.day<=nDays()?pos.day:firstOpenDay();M.order=null;buildList(pos&&pos.han);saveSet();E.order=null;E.rev.clear()}
+function firstOpenDay(){for(let k=1;k<=nDays();k++)if(!dayDone(k))return k;return 1}
+async function reloadDeck(){const keep=M.list[M.idx]&&M.list[M.idx].han;await openDeck(A.deck.id);buildList(keep);render()}
+async function switchDeck(id){savePos();await openDeck(id);render();toast(A.deck.name+" 서랍을 열었어요")}
+function render(){if(!A.token)return;syncMeta();if(A.view==="ios")renderIOS();else erpAll()}
+const needAdmin=()=>{if(isAdmin())return true;toast(ERR.ADMIN);return false};
+
+/* ===================== iOS 카드 화면 ===================== */
+const M={day:1,list:[],idx:0,rev:new Set(),order:null,tab:"tStudy"};
+function buildList(han){const base=dayWords(M.day);const f=A.set.filter;
+  let l=base.filter(w=>f==="todo"?!Pg(w).d:f==="x"?!!Pg(w).x:true);
+  if(M.order)l=shuffle(l);M.list=l;M.idx=0;if(han){const k=l.findIndex(w=>w.han===han);if(k>=0)M.idx=k}M.rev.clear()}
+function savePos(){if(!A.set)return;const w=M.list[M.idx];A.set.pos[A.deck.id]={day:M.day,han:w?w.han:null};saveSet()}
+function show(v){A.view=v;A.set.view=v;saveSet();$("login").hidden=true;$("ios").hidden=v!=="ios";$("erp").hidden=v!=="erp";
+  document.title=v==="erp"?"HSK 단어 암기 조회":"HSK 단어 서랍";
+  if(v==="ios")renderIOS();else erpEnter()}
+function renderIOS(){$("iDeckName").textContent=A.deck.name;
+  ["tStudy","tDrawers","tStats","tMe"].forEach(t=>$(t).hidden=t!==M.tab);
+  document.querySelectorAll("#iTabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===M.tab));
+  if(M.tab==="tStudy")renderStudy();else if(M.tab==="tDrawers")renderDrawers();else if(M.tab==="tStats")renderStats();else renderMe()}
+$("iTabs").onclick=e=>{const b=e.target.closest("button");if(!b)return;M.tab=b.dataset.t;syncMeta();renderIOS()};
+$("iErp").onclick=()=>switchView("erp");
+$("iDeck").onclick=()=>openDeckPicker();
+
+function subLine(){const ws=dayWords(M.day);const d=ws.filter(w=>Pg(w).d).length,x=ws.filter(w=>Pg(w).x).length;
+  return A.words.length?`${ws.length?ws[0].no:0}–${ws.length?ws[ws.length-1].no:0}번 · 외움 ${d}/${ws.length}${x?` · 헷갈림 ${x}`:""}`:"이 서랍은 비어 있어요"}
+function renderStudy(){const n=nDays();
+  $("iTitle").textContent=A.words.length?`Day ${M.day}`:A.deck.name;$("iSub").textContent=subLine();
+  $("iDays").innerHTML=A.words.length?Array.from({length:n},(_,i)=>`<button class="chip ${i+1===M.day?"on":""} ${dayDone(i+1)?"done":""}" data-day="${i+1}">Day ${i+1}</button>`).join(""):"";
+  const on=$("iDays").querySelector(".on");if(on)$("iDays").scrollLeft=on.offsetLeft-$("iDays").clientWidth/2+on.clientWidth/2;
+  document.querySelectorAll("#iFilter button").forEach(b=>b.classList.toggle("on",b.dataset.f===A.set.filter));
+  document.querySelectorAll("#iMasks button").forEach(b=>b.classList.toggle("on",!!A.set.mask[b.dataset.k]));
+  $("iShuf").classList.toggle("on",!!M.order);
+  renderBar();renderCard()}
+function renderBar(){$("iBar").innerHTML=M.list.map((w,i)=>{const s=Pg(w);return `<i class="${s.d?"d":s.x?"x":""} ${i===M.idx?"cur":""}"></i>`}).join("")}
+function renderCard(){const c=$("iCard");const w=M.list[M.idx];
+  if(!w){const emptyDeck=!A.words.length;c.innerHTML=`<div class="empty">${emptyDeck?`<b>서랍이 비어 있어요</b><span>${isAdmin()?"PDF·CSV·Word 파일로 단어를 넣어 주세요":"관리자가 단어를 올리면 여기에 나와요"}</span>${isAdmin()?`<button class="wide pri" style="width:auto;padding:12px 20px" id="cUp">파일 올리기</button>`:""}`:A.set.filter==="x"?`<b>헷갈리는 단어가 없어요</b><span>아래로 스와이프한 단어가 여기에 모여요</span>`:`<b>Day ${M.day}를 다 외웠어요</b><span>필터를 ‘전체’로 바꾸면 다시 볼 수 있어요</span>`}</div>`;
+    const u=$("cUp");u&&(u.onclick=()=>openUpload(A.deck.id));return}
+  const s=Pg(w),m=A.set.mask,hid=k=>m[k]&&!M.rev.has(k)&&!M.rev.has("all");
+  const L=[...w.han].length,cls=L>=10?"l10":L>=7?"l7":L>=5?"l5":"";
+  c.innerHTML=`<div class="c-top"><span>#${w.no} · ${M.idx+1} / ${M.list.length}</span>${s.d?`<span class="badge d">외움</span>`:s.x?`<span class="badge x">헷갈림</span>`:""}</div>
+   <div class="fld f-h ${cls} ${hid("h")?"hide":""}" data-f="h">${esc(w.han)}</div>
+   <div class="fld f-p ${hid("p")?"hide":""}" data-f="p">${esc(w.py)||"&nbsp;"}</div>
+   <div class="fld f-m ${hid("m")?"hide":""}" data-f="m">${esc(w.mn)||"&nbsp;"}</div>
+   <div class="stamp up" id="stUp">✓ 외웠어요</div><div class="stamp down" id="stDn">다시 볼게요</div>`}
+
+/* 스와이프: 좌우 = 카드 넘김, 위 = 외움, 아래 = 헷갈림(카드 그대로) */
+const card=$("iCard");let drag=null;
+card.addEventListener("pointerdown",e=>{if(!M.list.length||e.button>0||e.target.closest("button"))return;ac();drag={x:e.clientX,y:e.clientY,t:performance.now(),ax:null,id:e.pointerId};try{card.setPointerCapture(e.pointerId)}catch(_){}card.style.transition="none"});
+card.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!drag.ax&&Math.hypot(dx,dy)>8)drag.ax=Math.abs(dx)>Math.abs(dy)?"x":"y";
+  if(drag.ax==="x")card.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
+  else if(drag.ax==="y"){const r=Math.sign(dy)*Math.min(150,Math.abs(dy)*.5);card.style.transform=`translateY(${r}px) scale(${1-Math.abs(r)/1500})`;
+    const u=$("stUp"),d=$("stDn");if(u){u.style.opacity=Math.max(0,Math.min(1,-dy/90));d.style.opacity=Math.max(0,Math.min(1,dy/90))}}});
+function endDrag(e,cancel){if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y,dt=Math.max(1,performance.now()-drag.t),ax=drag.ax;drag=null;
+  if(cancel){spring();return}
+  if(!ax){spring();tapCard(e);return}
+  if(ax==="x"){if(Math.abs(dx)>70||(Math.abs(dx)>25&&Math.abs(dx)/dt>.45))nav(dx<0?1:-1);else spring();return}
+  if(Math.abs(dy)>55||(Math.abs(dy)>20&&Math.abs(dy)/dt>.45))swipeMark(dy<0?"d":"x");else spring()}
+card.addEventListener("pointerup",e=>endDrag(e,false));card.addEventListener("pointercancel",e=>endDrag(e,true));
+function spring(){card.style.transition="transform .42s cubic-bezier(.3,1.5,.5,1)";card.style.transform="";const u=$("stUp"),d=$("stDn");if(u&&!u.classList.contains("pop"))u.style.opacity="";if(d&&!d.classList.contains("pop"))d.style.opacity=""}
+function tapCard(e){const el=document.elementFromPoint(e.clientX,e.clientY);const f=el&&el.closest(".fld");
+  if(f&&f.classList.contains("hide")){M.rev.add(f.dataset.f);renderCard()}
+  else if(f&&f.dataset.f==="h"){say(M.list[M.idx].han)}
+  else if(Object.values(A.set.mask).some(Boolean)){M.rev.add("all");renderCard()}}
+let navBusy=false;
+function nav(dir){const n=M.idx+dir;if(n<0||n>=M.list.length){spring();toast(n<0?"첫 카드예요":(M.day<nDays()?`Day ${M.day}의 마지막 카드예요`:"마지막 카드예요"));return}
+  if(navBusy)return;navBusy=true;card.style.transition="transform .2s ease-in, opacity .2s";card.style.transform=`translateX(${-dir*115}%) rotate(${-dir*9}deg)`;card.style.opacity="0";
+  setTimeout(()=>{M.idx=n;M.rev.clear();renderCard();renderBar();card.style.transition="none";card.style.transform=`translateX(${dir*55}%)`;void card.offsetWidth;
+    card.style.transition="transform .3s cubic-bezier(.2,.8,.2,1), opacity .22s";card.style.transform="";card.style.opacity="1";savePos();navBusy=false},190)}
+function swipeMark(kind){const w=M.list[M.idx];if(!w){spring();return}mark(w,kind);(kind==="d"?ding:dung)();
+  spring();renderCard();const st=$(kind==="d"?"stUp":"stDn");st.style.opacity="";st.classList.add("pop");
+  renderBar();$("iSub").textContent=subLine();
+  if(kind==="d"&&dayDone(M.day)){setTimeout(dayComplete,650);return}
+  if(A.set.auto&&M.idx<M.list.length-1)setTimeout(()=>nav(1),450)}
+function bump(kind){if(!M.list.length)return;card.style.transition="transform .12s ease-out";card.style.transform=`translateY(${kind==="d"?-36:36}px)`;setTimeout(()=>swipeMark(kind),110)}
+function dayComplete(){const k=M.day,last=k>=nDays();modal(`Day ${k} 완료`,`<div class="qcard"><div><div class="q ko" style="font-size:22px">Day ${k}의 ${dayWords(k).length}단어를 모두 외웠어요</div><div class="note" style="margin-top:6px">헷갈림으로 표시했던 단어도 외움으로 바뀌었어요</div></div></div>
+  <div class="row2">${last?"":`<button class="btn pri blk" id="dcNext">Day ${k+1} 시작하기</button>`}<button class="btn blk" id="dcStay">계속 보기</button></div>`);
+  const n=$("dcNext");n&&(n.onclick=()=>{closeModal();goDay(k+1)});$("dcStay").onclick=closeModal;$("toast").hidden=true;renderStudy()}
+function goDay(k){M.day=k;M.order=null;buildList();savePos();renderStudy()}
+$("iDays").onclick=e=>{const b=e.target.closest("[data-day]");if(b)goDay(+b.dataset.day)};
+$("iFilter").onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;A.set.filter=b.dataset.f;saveSet();buildList(M.list[M.idx]&&M.list[M.idx].han);renderStudy()};
+$("iMasks").onclick=e=>{const b=e.target.closest("[data-k]");if(!b)return;A.set.mask[b.dataset.k]=A.set.mask[b.dataset.k]?0:1;saveSet();M.rev.clear();renderStudy()};
+$("iSay").onclick=()=>{const w=M.list[M.idx];w&&say(w.han)};
+$("iShuf").onclick=()=>{M.order=M.order?null:1;buildList();renderStudy();toast(M.order?"순서를 섞었어요":"원래 순서로 돌아왔어요")};
+$("iQuiz").onclick=()=>startQuiz(dayWords(M.day),A.set.dir);
+$("iUp").onclick=()=>{ac();bump("d")};$("iDn").onclick=()=>{ac();bump("x")};
+$("iPrev").onclick=()=>nav(-1);$("iNext").onclick=()=>nav(1);
+
+/* 서랍 탭 */
+function deckRow(d){const s=deckStats(d),days=Math.max(1,Math.ceil(s.n/per()));const pc=s.n?Math.round(s.d/s.n*100):0;
+  return `<div class="li tap ind" data-open="${esc(d.id)}" role="button" tabindex="0"><span class="folder" style="--c:${esc(d.color||"#007aff")}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A1.5 1.5 0 014.5 5h4.6l2 2h8.4A1.5 1.5 0 0121 8.5v9a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 17.5z"/></svg></span>
+  <span class="grow"><b style="font-weight:500">${esc(d.name)}</b>${d.id===A.deck.id?` <span style="color:var(--blue);font-size:13px">학습 중</span>`:""}<small>${s.n?`${s.n}단어 · ${days}일 · 외움 ${pc}%`:"비어 있음"+(isAdmin()?" · 파일을 올려 주세요":"")}</small>${s.n?`<div class="mini"><i style="width:${pc}%"></i></div>`:""}</span>
+  <button class="more" data-more="${esc(d.id)}" aria-label="${esc(d.name)} 메뉴">⋯</button></div>`}
+function renderDrawers(){
+  $("iDrawers").innerHTML=`<h1 class="large">서랍</h1><div class="sub">급수·교재별로 단어를 나눠 담아요</div>
+  <div class="group" style="margin-top:14px">${A.decks.map(deckRow).join("")||`<div class="li" style="color:var(--sec)">서랍이 없어요</div>`}</div>
+  ${isAdmin()?`<button class="wide" id="dNew">새 서랍 만들기</button><button class="wide pri" id="dUp">파일로 단어 올리기</button>`:""}
+  <p class="foot">${isAdmin()?"PDF, CSV, Word(.docx) 파일을 올리면 한 줄(행)마다 중국어·병음·뜻을 찾아 서랍에 넣어요. ":""}서랍은 모든 계정이 같이 쓰고, 진도는 계정마다 따로 저장돼요.${isAdmin()?"":" 서랍에 단어를 올리는 건 관리자만 할 수 있어요."}</p>`;
+  const n=$("dNew");n&&(n.onclick=()=>newDeck());const u=$("dUp");u&&(u.onclick=()=>openUpload(A.deck.id))}
+$("iDrawers").addEventListener("click",async e=>{const m=e.target.closest("[data-more]");if(m){e.stopPropagation();deckMenu(m.dataset.more);return}
+  const r=e.target.closest("[data-open]");if(r){M.tab="tStudy";await switchDeck(r.dataset.open)}});
+function openDeckPicker(){modal("서랍 선택",`<div class="list">${A.decks.map(d=>`<button class="btn" data-pick="${esc(d.id)}">${d.id===A.deck.id?"✓ ":""}${esc(d.name)} <span style="opacity:.6">· ${deckStats(d).n}단어</span></button>`).join("")}</div>
+  ${isAdmin()?`<div class="list"><button class="btn" id="pkUp">파일로 단어 올리기</button><button class="btn" id="pkNew">새 서랍 만들기</button></div>`:""}`);
+  $("ovB").querySelectorAll("[data-pick]").forEach(b=>b.onclick=async()=>{closeModal();await switchDeck(b.dataset.pick)});
+  const u=$("pkUp");u&&(u.onclick=()=>openUpload(A.deck.id));const n=$("pkNew");n&&(n.onclick=()=>newDeck())}
+function newDeck(){if(!needAdmin())return;modal("새 서랍",`<span class="lbl">서랍 이름</span><input class="inp" id="ndName" maxlength="30" placeholder="예: HSK 5급, 학원 3월 단어">
+  <div class="note" id="ndMsg">만든 다음 바로 파일을 올릴 수 있어요.</div><button class="btn pri blk" id="ndGo">만들기</button>`);setTimeout(()=>$("ndName").focus(),50);
+  $("ndGo").onclick=async()=>{const n=$("ndName").value.trim();if(!n){$("ndMsg").textContent="서랍 이름을 입력해 주세요.";return}
+    $("ndGo").disabled=true;try{const r=await call("deckCreate",n,COLORS[A.decks.length%COLORS.length]);A.decks=r.decks;closeModal();render();openUpload(r.id)}catch(e){$("ndGo").disabled=false}}}
+function deckMenu(id){const d=A.decks.find(x=>x.id===id);if(!d)return;const adm=isAdmin();
+  modal(d.name,`<div class="list"><button class="btn" data-a="open">이 서랍 열기</button>${adm?`<button class="btn" data-a="up">파일로 단어 올리기</button><button class="btn" data-a="ren">이름 바꾸기</button>`:""}</div>
+  <div class="list"><button class="btn" data-a="reset">내 진도 초기화</button>${adm?`<button class="btn danger" data-a="clear">단어 모두 비우기</button><button class="btn danger" data-a="del">서랍 삭제</button>`:""}</div>`);
+  $("ovB").querySelectorAll("[data-a]").forEach(b=>b.onclick=async()=>{const a=b.dataset.a;const n=deckStats(d).n;
+    if(a==="open"){closeModal();if(A.view==="ios")M.tab="tStudy";await switchDeck(id)}
+    else if(a==="up")openUpload(id);
+    else if(a==="ren")renameDeck(id);
+    else if(a==="reset")confirmBox("내 진도 초기화",`${esc(d.name)} 서랍의 외움·헷갈림·메모 기록을 지웁니다. 단어는 그대로 남아요.`,"초기화",async()=>{await flush();await call("clearProgress",id);d.dn=d.xn=0;if(id===A.deck.id)await reloadDeck();else render();toast("진도를 초기화했어요")});
+    else if(a==="clear")confirmBox("단어 모두 비우기",`${esc(d.name)} 서랍의 단어 ${n}개를 모두 지웁니다. 모든 계정에서 사라져요.`,"비우기",async()=>{A.decks=await call("deckClear",id);if(id===A.deck.id)await reloadDeck();else render();toast("서랍을 비웠어요")});
+    else if(a==="del")confirmBox("서랍 삭제",`${esc(d.name)} 서랍과 단어 ${n}개를 지웁니다. 모든 계정에서 사라져요.`,"삭제",async()=>{A.decks=await call("deckDelete",id);if(id===A.deck.id)await openDeck(A.decks[0]?A.decks[0].id:"");render();toast("서랍을 삭제했어요")})})}
+function renameDeck(id){const d=A.decks.find(x=>x.id===id);modal("이름 바꾸기",`<input class="inp" id="rnName" maxlength="30" value="${esc(d.name)}"><button class="btn pri blk" id="rnGo">저장</button>`);
+  $("rnGo").onclick=async()=>{const n=$("rnName").value.trim();if(!n)return;A.decks=await call("deckRename",id,n);if(id===A.deck.id)A.deck.name=n;closeModal();render()}}
+function confirmBox(title,msg,okLabel,fn){modal(title,`<div class="note" style="font-size:15px">${msg}</div><div class="row2"><button class="btn" id="cfNo">취소</button><button class="btn danger" id="cfYes">${esc(okLabel)}</button></div>`);
+  $("cfNo").onclick=closeModal;$("cfYes").onclick=async()=>{closeModal();try{await fn()}catch(e){}}}
+
+/* 진도 탭 */
+function renderStats(){const s=deckStats(A.deck),pc=s.n?s.d/s.n:0,R=40,C=2*Math.PI*R;const n=nDays();
+  $("iStats").innerHTML=`<h1 class="large">진도</h1><div class="sub">${esc(A.user.name)} · ${esc(A.deck.name)}</div>
+  <div class="group ringbox" style="margin-top:14px"><svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--fill2)" stroke-width="10"/><circle cx="50" cy="50" r="${R}" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*pc} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle">${Math.round(pc*100)}%</text></svg>
+   <div class="kv grow"><span>외움</span><b>${s.d}</b><span>헷갈림</span><b style="color:var(--orange)">${s.x}</b><span>남은 단어</span><b>${s.n-s.d}</b><span>전체</span><b>${s.n}</b></div></div>
+  <h3 class="sect">일차별 · 하루 ${per()}단어</h3>
+  <div class="daygrid">${A.words.length?Array.from({length:n},(_,i)=>{const ws=dayWords(i+1),d=ws.filter(w=>Pg(w).d).length;return `<button class="dtile ${i+1===M.day?"on":""} ${d===ws.length?"done":""}" data-gday="${i+1}"><b>Day ${i+1}</b><small>${d}/${ws.length}</small><div class="mini"><i style="width:${d/ws.length*100}%"></i></div></button>`}).join(""):`<div class="foot">단어가 들어오면 일차가 생겨요.</div>`}</div>
+  <h3 class="sect">모든 서랍</h3><div class="group">${A.decks.map(d=>{const t=deckStats(d);const p=t.n?Math.round(t.d/t.n*100):0;return `<div class="li"><span class="grow">${esc(d.name)}<small>${t.d}/${t.n} 외움 · 헷갈림 ${t.x}</small><div class="mini"><i style="width:${p}%"></i></div></span><b style="font-variant-numeric:tabular-nums">${p}%</b></div>`}).join("")}</div>`}
+$("iStats").addEventListener("click",e=>{const b=e.target.closest("[data-gday]");if(b){M.tab="tStudy";goDay(+b.dataset.gday);renderIOS()}});
+
+/* 내 정보 탭 */
+function renderMe(){$("iMe").innerHTML=`<h1 class="large">내 정보</h1>
+  <div class="group" style="margin-top:14px"><div class="li"><span class="avatar">${esc(A.user.name.slice(0,1))}</span><span class="grow">${esc(A.user.name)}${isAdmin()&&REMOTE?` <span style="color:var(--blue);font-size:13px">관리자</span>`:""}<small>가입 ${esc(A.user.created||"")}</small></span></div></div>
+  <h3 class="sect">학습</h3><div class="group">
+   <div class="li"><span class="grow">하루 단어 수<small>일차를 나누는 기준이에요</small></span><span class="stepper"><button id="mMinus" aria-label="줄이기">−</button><b id="mPer">${per()}</b><button id="mPlus" aria-label="늘리기">+</button></span></div>
+   <label class="li"><span class="grow">외움 체크 후 다음 카드로</span><input type="checkbox" class="sw" id="mAuto" ${A.set.auto?"checked":""}></label>
+   <label class="li"><span class="grow">효과음</span><input type="checkbox" class="sw" id="mSound" ${A.set.sound?"checked":""}></label>
+   <div class="li"><span class="grow">테스트 방향</span><select id="mDir" style="border:0;background:none;color:var(--blue);font:inherit"><option value="h2k">중국어 → 뜻</option><option value="k2h">뜻 → 중국어</option><option value="p2k">병음 → 뜻</option></select></div></div>
+  <h3 class="sect">화면</h3><div class="group"><button class="li tap" id="mErp"><span class="grow">ERP 화면으로 보기</span><span class="chev">›</span></button><button class="li tap" id="mHelp"><span class="grow">사용법</span><span class="chev">›</span></button></div>
+  <h3 class="sect">계정</h3><div class="group"><button class="li tap blue" id="mNew">새 계정 만들기</button><button class="li tap" id="mReset">${esc(A.deck.name)} 진도 초기화</button><button class="li tap red" id="mOut">로그아웃</button></div>
+  <p class="foot">${REMOTE?"서버에 저장되고 있어요. 어느 기기에서 로그인해도 같은 서랍과 진도로 이어집니다.":"로컬 모드: 계정·서랍·진도가 이 브라우저에만 저장돼요. config.js에 Supabase 주소와 키를 넣으면 서버에 저장됩니다."}</p>`;
+  $("mDir").value=A.set.dir;
+  const setPer=v=>{const keep=M.list[M.idx]&&M.list[M.idx].han;const w=A.words.find(x=>x.han===keep);A.set.perDay=Math.max(5,Math.min(100,v));if(w)M.day=dayOf(w);else M.day=Math.min(M.day,nDays());buildList(keep);savePos();$("mPer").textContent=per()};
+  $("mMinus").onclick=()=>setPer(per()-5);$("mPlus").onclick=()=>setPer(per()+5);
+  $("mAuto").onchange=e=>{A.set.auto=e.target.checked?1:0;saveSet()};$("mSound").onchange=e=>{A.set.sound=e.target.checked?1:0;saveSet();if(A.set.sound)ding()};
+  $("mDir").onchange=e=>{A.set.dir=e.target.value;saveSet()};
+  $("mErp").onclick=()=>switchView("erp");$("mHelp").onclick=openHelp;$("mNew").onclick=openSignup;$("mOut").onclick=logout;
+  $("mReset").onclick=()=>confirmBox("진도 초기화",`${esc(A.deck.name)} 서랍의 내 외움·헷갈림·메모 기록을 지웁니다.`,"초기화",async()=>{await flush();await call("clearProgress",A.deck.id);await reloadDeck();toast("진도를 초기화했어요")})}
+
+/* ===================== 파일 올리기 (관리자) ===================== */
+const PDFJS="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/";
+const MAMMOTH="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js";
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`)){res();return}const s=document.createElement("script");s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error("파일 읽기 도구를 불러오지 못했어요"));document.head.appendChild(s)})}
+async function readPDF(buf){if(!window.pdfjsLib)await loadScript(PDFJS+"pdf.min.js");if(!window.pdfjsWorker)await loadScript(PDFJS+"pdf.worker.min.js");
+  pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";
+  const doc=await pdfjsLib.getDocument({data:new Uint8Array(buf),isEvalSupported:false,disableFontFace:true,cMapUrl:"https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/",cMapPacked:true}).promise;
+  const rows=[];for(let i=1;i<=doc.numPages;i++){const tc=await (await doc.getPage(i)).getTextContent();rows.push(...WP.pdfItemsToRows(tc.items))}return rows}
+async function readDOCX(buf){if(!window.mammoth)await loadScript(MAMMOTH);const r=await mammoth.convertToHtml({arrayBuffer:buf});return WP.htmlTablesToRows(r.value)}
+async function parseFile(file){const buf=await file.arrayBuffer();const ext=(file.name.split(".").pop()||"").toLowerCase();
+  let rows;if(ext==="pdf")rows=await readPDF(buf);else if(ext==="docx")rows=await readDOCX(buf);
+  else if(["csv","tsv","txt"].includes(ext))rows=WP.textToRows(WP.decode(buf));
+  else throw new Error("PDF, CSV, TXT, Word(.docx) 파일만 올릴 수 있어요");
+  return WP.rowsToWords(rows)}
+let UP=null;
+function openUpload(deckId){if(!needAdmin())return;UP={deck:deckId||A.deck.id,rows:[],name:"",newName:""};
+  modal("단어 올리기",`<span class="lbl">넣을 서랍</span>
+   <select class="inp" id="uDeck">${A.decks.map(d=>`<option value="${esc(d.id)}" ${d.id===UP.deck?"selected":""}>${esc(d.name)} (${deckStats(d).n})</option>`).join("")}<option value="__new">+ 새 서랍 만들기</option></select>
+   <input class="inp" id="uNew" maxlength="30" placeholder="새 서랍 이름 (예: HSK 5급)" hidden>
+   <label class="drop" for="uFile"><b>파일 선택</b><span>PDF · CSV · Word(.docx) · TXT</span><span style="font-size:12px">표의 한 행에 중국어, 병음, 뜻이 있으면 자동으로 찾아요</span></label>
+   <input type="file" id="uFile" accept=".pdf,.csv,.tsv,.txt,.docx,application/pdf,text/csv" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+   <details><summary>직접 붙여넣기</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><textarea class="inp" id="uPaste" rows="5" placeholder="经验丰富, jīngyàn fēngfù, 경험이 풍부하다&#10;热情可爱  rèqíng kě'ài  열정적이고 사랑스럽다"></textarea><button class="btn" id="uPasteGo">인식하기</button></div></details>
+   <div class="note" id="uMsg"></div>`);
+  $("uDeck").onchange=e=>{$("uNew").hidden=e.target.value!=="__new";if(e.target.value==="__new")$("uNew").focus()};
+  $("uFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;$("uMsg").textContent=`${f.name} 읽는 중…`;
+    try{const rows=await parseFile(f);UP.name=f.name;uPreview(rows)}catch(err){$("uMsg").textContent=(err&&err.message?err.message:"파일을 읽지 못했어요")+" · 다른 파일로 다시 시도하거나 붙여넣기를 써 보세요."}};
+  $("uPasteGo").onclick=()=>{const t=$("uPaste").value;if(!t.trim()){$("uMsg").textContent="붙여넣을 단어가 없어요.";return}UP.name="붙여넣기";uPreview(WP.rowsToWords(WP.textToRows(t)))}}
+function uPreview(rows){
+  if(!rows.length){$("uMsg").textContent="중국어 단어를 찾지 못했어요. 한 행에 ‘중국어 · 병음 · 뜻’이 있는 표인지 확인해 주세요.";return}
+  const sel=$("uDeck").value;UP.deck=sel;UP.newName=sel==="__new"?($("uNew").value.trim()||UP.name.replace(/\.[^.]+$/,"")||"새 서랍"):"";
+  const d=A.decks.find(x=>x.id===sel);const dname=d?d.name:UP.newName,dn=d?deckStats(d).n:0;
+  const dd=WP.dedupe(rows);UP.rows=dd.words;
+  modal("단어 확인",`<div class="note"><b>${esc(UP.name)}</b>에서 ${dd.words.length}개를 찾았어요${dd.dup?` (파일 안 중복 ${dd.dup}개 제외)`:""}. 칸을 눌러 고치거나 ✕로 뺄 수 있어요.</div>
+   <div class="note">넣을 서랍: <b>${esc(dname)}</b>${d?` · 지금 ${dn}단어`:" · 새로 만들어요"}</div>
+   ${d&&dn?`<div class="radio"><label><input type="radio" name="uMode" value="add" checked> 기존 단어 뒤에 추가</label><label><input type="radio" name="uMode" value="rep"> 서랍 비우고 교체</label></div>`:""}
+   <div class="pwrap"><table class="ptable"><thead><tr><th>#</th><th>중국어</th><th>병음</th><th>뜻</th><th></th></tr></thead><tbody id="uTb">${UP.rows.map((w,i)=>`<tr><td style="color:var(--sec);opacity:.7">${i+1}</td><td class="hz" contenteditable="true">${esc(w[0])}</td><td contenteditable="true">${esc(w[1])}</td><td contenteditable="true">${esc(w[2])}</td><td><button class="del" aria-label="빼기">✕</button></td></tr>`).join("")}</tbody></table></div>
+   <div class="row2"><button class="btn" id="uBack">다시 고르기</button><span class="sp"></span><button class="btn pri" id="uSave">서랍에 넣기</button></div>`);
+  $("uTb").onclick=e=>{const b=e.target.closest(".del");if(b)b.closest("tr").remove()};
+  $("uBack").onclick=()=>openUpload(UP.deck==="__new"?A.deck.id:UP.deck);
+  $("uSave").onclick=async()=>{const list=[...$("uTb").querySelectorAll("tr")].map(tr=>{const c=tr.children;return[c[1].textContent.trim(),c[2].textContent.trim(),c[3].textContent.trim()]}).filter(w=>w[0]);
+    if(!list.length){toast("넣을 단어가 없어요");return}
+    const m=document.querySelector('input[name="uMode"]:checked');const replace=!!m&&m.value==="rep";
+    $("uSave").disabled=true;$("uSave").textContent="넣는 중…";
+    try{let id=UP.deck;if(id==="__new"){const r=await call("deckCreate",UP.newName,COLORS[A.decks.length%COLORS.length]);A.decks=r.decks;id=r.id}
+      const r=await call("putWords",id,WP.dedupe(list).words,replace);A.decks=r.decks;
+      closeModal();savePos();await openDeck(id);if(A.view==="ios")M.tab="tStudy";render();
+      toast(`${A.deck.name}에 ${r.added}단어를 넣었어요${r.dup?` · 이미 있던 ${r.dup}개 제외`:""}`)}
+    catch(e){const b=$("uSave");if(b){b.disabled=false;b.textContent="서랍에 넣기"}}}}
+
+/* ===================== 테스트 (두 화면 공용) ===================== */
+let Q=null;
+function startQuiz(pool,dir){if(A.words.length<2){toast("단어가 2개 이상 있어야 테스트할 수 있어요");return}
+  if(!pool.length)pool=A.words;const qs=shuffle(pool).slice(0,Math.min(20,pool.length));Q={qs,k:0,ok:0,dir:dir||"h2k",pool:pool.length>=4?pool:A.words};askQ()}
+function askQ(){const{qs,k,dir}=Q;if(k>=qs.length)return endQ();const w=qs[k];
+  const others=shuffle(Q.pool.filter(o=>o.han!==w.han&&o.mn!==w.mn)).slice(0,3);const opts=shuffle([w,...others]);
+  const qt=dir==="k2h"?`<div class="q ko">${esc(w.mn)}</div>`:dir==="p2k"?`<div class="q ko">${esc(w.py)}</div>`:`<div class="q">${esc(w.han)}</div>`;
+  modal("테스트",`<div class="qmeta"><span>${k+1} / ${qs.length}</span><span>정답 ${Q.ok}</span></div><div class="qcard">${qt}</div>
+   <div class="opts">${opts.map((o,j)=>`<button class="opt ${dir==="k2h"?"han":""}" data-j="${j}">${j+1}. ${esc(dir==="k2h"?o.han:o.mn)}</button>`).join("")}</div>
+   <div class="row2"><button class="btn" id="qSay">🔊 발음</button><span class="sp note" id="qMsg"></span><button class="btn pri" id="qNext" hidden>다음</button></div>`,()=>render());
+  $("qSay").onclick=()=>say(w.han);let done=false;
+  $("ovB").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(done)return;done=true;const good=opts[+b.dataset.j]===w;
+    $("ovB").querySelectorAll(".opt").forEach(x=>{if(opts[+x.dataset.j]===w)x.classList.add("ok")});if(!good)b.classList.add("ng");
+    if(good){Q.ok++;touchSave(w);ding()}else{mark(w,"x");dung()}
+    $("qMsg").textContent=`${good?"정답":"오답"} · ${w.han} ${w.py}`;$("qNext").hidden=false;$("qNext").focus()});
+  $("qNext").onclick=()=>{Q.k++;askQ()}}
+function endQ(){const{ok,qs}=Q;modal("테스트 결과",`<div class="qcard"><div><div class="q ko" style="font-size:28px">${ok} / ${qs.length}</div><div class="note">정답률 ${Math.round(ok/qs.length*100)}% · 틀린 단어는 헷갈림으로 표시했어요</div></div></div>
+  <div class="row2"><button class="btn" id="qWrong">헷갈림 모아보기</button><span class="sp"></span><button class="btn" id="qAgain">다시 풀기</button><button class="btn pri" id="qClose">닫기</button></div>`,()=>render());
+  const dir=Q.dir;$("qAgain").onclick=()=>startQuiz(A.view==="ios"?dayWords(M.day):E.rows,dir);$("qClose").onclick=closeModal;
+  $("qWrong").onclick=()=>{closeModal();if(A.view==="ios"){A.set.filter="x";saveSet();buildList();M.tab="tStudy";renderIOS()}else{$("cState").value="wrong";erpRead();erpRefresh()}}}
+function openHelp(){modal("사용법",`<div class="help note" style="font-size:14px;line-height:1.6">
+<p><b>카드 화면</b> 좌우로 넘기면 같은 Day의 단어를 오가요. 위로 올리면 ‘외움’, 아래로 내리면 ‘헷갈림’으로 체크돼요. 카드는 넘어가지 않아요.</p>
+<p><b>가리기</b> 한자·병음·뜻 버튼으로 가리고, 가려진 칸을 누르면 보여요. 보이는 한자를 누르면 발음이 나와요.</p>
+<p><b>ERP 화면</b> 같은 서랍과 진도를 사내 ERP 조회 화면처럼 표로 봐요. 체크한 내용은 두 화면이 같이 써요.</p>
+<p><b>키보드</b> <kbd>←</kbd><kbd>→</kbd> 넘기기 · <kbd>↑</kbd> 외움 · <kbd>↓</kbd> 헷갈림 · <kbd>Space</kbd> 보기 · <kbd>S</kbd> 발음 (ERP: <kbd>↑</kbd><kbd>↓</kbd> 이동, <kbd>Space</kbd> 외움)</p>
+<p><b>서랍</b> 급수·교재별로 서랍을 나눠요. 관리자가 PDF·CSV·Word 파일을 올리면 모든 계정이 같이 보고, 진도는 계정마다 따로 쌓여요.</p></div>`)}
+
+/* ===================== ERP 화면 ===================== */
+const E={rows:[],cur:0,order:null,sortK:null,sortD:1,rev:new Set(),f:{d1:1,d2:1,state:"all",q:""}};
+function switchView(v){if(v==="erp"){const w=M.list[M.idx];E.f.d1=E.f.d2=M.day;E.f.state="all";E.f.q="";E.order=null;E.sortK=null;show("erp");erpRefresh(w&&w.han)}
+  else{const w=E.rows[E.cur];if(w){M.day=dayOf(w);M.order=null;buildList(w.han);if(!M.list.some(x=>x.han===w.han)){A.set.filter="all";buildList(w.han)}savePos()}M.tab="tStudy";show("ios")}}
+function erpEnter(){$("eUser").textContent=A.user.name;erpMenus();erpCondFill();erpRefresh()}
+function erpAll(){$("eUser").textContent=A.user.name;erpMenus();erpCondFill();erpRefresh(E.rows[E.cur]&&E.rows[E.cur].han)}
+function erpMenus(){
+  $("eMenu").innerHTML=`<button data-m="file">파일</button><span class="msep"></span>${A.decks.map(d=>`<button data-m="deck:${esc(d.id)}" class="${d.id===A.deck.id?"on":""}">${esc(d.name)}</button>`).join("")}<span class="msep"></span><button data-m="today">현재일차</button><button data-m="alld">전체일차</button><button data-m="todo">미암기</button><button data-m="done">외움</button><button data-m="wrong">헷갈림</button><span class="msep"></span><button data-m="test">테스트</button><button data-m="acct">계정</button><button data-m="help">A/S</button>`;
+  $("eDocTab").textContent="HSK 단어 암기 조회 - "+A.deck.name}
+function erpCondFill(){const n=nDays(),opt=Array.from({length:n},(_,i)=>`<option value="${i+1}">Day ${i+1}</option>`).join("");
+  $("cD1").innerHTML=opt;$("cD2").innerHTML=opt;E.f.d1=Math.min(E.f.d1,n);E.f.d2=Math.min(Math.max(E.f.d2,E.f.d1),n);$("cD1").value=E.f.d1;$("cD2").value=E.f.d2;
+  $("cDeck").innerHTML=A.decks.map(d=>`<option value="${esc(d.id)}">${esc(d.name)}</option>`).join("");$("cDeck").value=A.deck.id;
+  $("cState").value=E.f.state;$("cQ").value=E.f.q;$("cH").checked=!!A.set.mask.h;$("cP").checked=!!A.set.mask.p;$("cM").checked=!!A.set.mask.m;$("dDir").value=A.set.dir}
+function erpRead(){E.f.d1=+$("cD1").value||1;E.f.d2=Math.max(E.f.d1,+$("cD2").value||1);E.f.state=$("cState").value;E.f.q=$("cQ").value}
+function sortVal(w,k){const s=Pg(w);return{day:w.i,no:w.i,han:w.han,py:strip(w.py),mn:w.mn,memo:s.m||"",done:s.d||0,wrong:s.x||0,cnt:s.c||0,last:s.t||""}[k]}
+function erpFilter(){const q=E.f.q.trim().toLowerCase(),pq=strip(q);
+  let v=A.words.filter(w=>{const d=dayOf(w);if(d<E.f.d1||d>E.f.d2)return false;const s=Pg(w);
+    if(E.f.state==="todo"&&s.d)return false;if(E.f.state==="done"&&!s.d)return false;if(E.f.state==="wrong"&&!s.x)return false;
+    if(q&&!(w.han.includes(q)||strip(w.py).includes(pq)||w.mn.toLowerCase().includes(q)||(s.m||"").toLowerCase().includes(q)))return false;return true});
+  if(E.order)v.sort((a,b)=>E.order[a.i]-E.order[b.i]);else if(E.sortK)v.sort((a,b)=>{const x=sortVal(a,E.sortK),y=sortVal(b,E.sortK);return(x>y?1:x<y?-1:0)*E.sortD});
+  E.rows=v}
+function erpRefresh(han){erpFilter();E.cur=0;if(han){const k=E.rows.findIndex(w=>w.han===han);if(k>=0)E.cur=k}erpRender();const tr=$("eTb").querySelector(`tr[data-r="${E.cur}"]`);tr&&tr.scrollIntoView({block:"nearest"})}
+function erpRender(){const m=A.set.mask;let h="";
+  E.rows.forEach((w,r)=>{const s=Pg(w),rv=E.rev.has(w.i),mh=m.h&&!rv,mp=m.p&&!rv,mm=m.m&&!rv;
+    h+=`<tr data-r="${r}" class="${r===E.cur?"cur":""} ${s.d?"done":""}"><td class="ind">${r===E.cur?"❯":""}</td><td class="c">Day ${dayOf(w)}</td><td class="c">${w.no}</td><td class="hz ${r===E.cur?"focus":""} ${mh?"masked":""}" data-rev>${esc(w.han)}</td><td class="${mp?"masked":""}" data-rev>${esc(w.py)}</td><td class="mn ${mm?"masked":""}" data-rev title="${mm?"":esc(w.mn)}">${esc(w.mn)}</td><td>${esc(s.m||"")}</td><td class="c"><input type="checkbox" class="cb" data-d ${s.d?"checked":""} aria-label="외움"></td><td class="c"><input type="checkbox" class="cb red" data-x ${s.x?"checked":""} aria-label="헷갈림"></td><td class="c">${s.c||""}</td><td class="c">${s.t||""}</td></tr>`});
+  $("eTb").innerHTML=h||`<tr><td colspan="11" style="text-align:center;padding:20px;color:#667">${A.words.length?"조건에 맞는 단어가 없습니다. 조회조건을 바꿔보세요.":isAdmin()?"서랍이 비어 있습니다. 툴바의 [올리기]로 파일을 넣어 주세요.":"서랍이 비어 있습니다. 관리자가 단어를 올리면 표시됩니다."}</td></tr>`;
+  document.querySelectorAll("#erp thead th[data-k]").forEach(th=>{const a=th.querySelector(".arr");a&&a.remove();if(th.dataset.k===E.sortK&&!E.order)th.insertAdjacentHTML("beforeend",`<span class="arr">${E.sortD>0?"▲":"▼"}</span>`)});
+  erpDetail();erpStats()}
+function erpDetail(){const w=E.rows[E.cur];$("eRec").textContent=`Record ${E.rows.length?E.cur+1:0} of ${E.rows.length}`;
+  if(!w){["dSrc","dDay","dNo","dTot","dHan","dPy","dMean","dCnt","dMemo"].forEach(i=>$(i).value="");$("dSrc").value=A.deck.name;return}
+  const s=Pg(w),m=A.set.mask,rv=E.rev.has(w.i);
+  $("dSrc").value=A.deck.name;$("dDay").value=`Day ${dayOf(w)} / ${nDays()}`;$("dNo").value=w.no;$("dTot").value=`~ ${A.words.length}`;
+  $("dHan").value=w.han;$("dPy").value=w.py;$("dMean").value=w.mn;$("dCnt").value=`학습 ${s.c||0}회${s.t?" · "+String(s.t).slice(5):""}`;$("dMemo").value=s.m||"";$("dState").value=s.x?2:s.d?1:0;
+  $("dHan").classList.toggle("masked",!!m.h&&!rv);$("dPy").classList.toggle("masked",!!m.p&&!rv);$("dMean").classList.toggle("masked",!!m.m&&!rv)}
+function erpStats(){const s=deckStats(A.deck);$("sDone").textContent=s.d;$("sWrong").textContent=s.x;$("sTodo").textContent=s.n-s.d;
+  $("sBar").style.width=(s.n?s.d/s.n*100:0).toFixed(1)+"%";$("eCnt").textContent=`외움 ${s.d} / ${s.n}`}
+function eGo(r){if(!E.rows.length)return;E.cur=Math.max(0,Math.min(E.rows.length-1,r));erpRender();const tr=$("eTb").querySelector(`tr[data-r="${E.cur}"]`);tr&&tr.scrollIntoView({block:"nearest"})}
+const ePg=()=>Math.max(5,Math.floor($("gwrap").clientHeight/22)-2);
+function eToggle(kind){const w=E.rows[E.cur];if(!w)return;const s=Pg(w);mark(w,(kind==="d"?s.d:s.x)?null:kind);erpRender()}
+$("eTb").addEventListener("click",e=>{const tr=e.target.closest("tr[data-r]");if(!tr)return;const r=+tr.dataset.r,w=E.rows[r];
+  if(e.target.matches("[data-d]"))mark(w,e.target.checked?"d":null);
+  else if(e.target.matches("[data-x]"))mark(w,e.target.checked?"x":null);
+  else if(e.target.closest("[data-rev]")&&Object.values(A.set.mask).some(Boolean)&&!E.rev.has(w.i)){E.rev.add(w.i);touchSave(w)}
+  E.cur=r;erpRender()});
+$("eTb").addEventListener("dblclick",e=>{const tr=e.target.closest("tr[data-r]");if(tr)say(E.rows[+tr.dataset.r].han)});
+document.querySelectorAll("#erp thead th[data-k]").forEach(th=>th.onclick=()=>{const k=th.dataset.k;E.order=null;if(E.sortK===k)E.sortD=-E.sortD;else{E.sortK=k;E.sortD=1}erpRefresh(E.rows[E.cur]&&E.rows[E.cur].han)});
+document.querySelectorAll("#erp .nav button").forEach(b=>b.onclick=()=>{const n=b.dataset.n;
+  if(n==="first")eGo(0);else if(n==="last")eGo(E.rows.length-1);else if(n==="p")eGo(E.cur-1);else if(n==="n")eGo(E.cur+1);else if(n==="pp")eGo(E.cur-ePg());else if(n==="nn")eGo(E.cur+ePg());else if(n==="done")eToggle("d");else if(n==="wrong")eToggle("x")});
+$("bPrev").onclick=()=>eGo(E.cur-1);$("bNext").onclick=()=>eGo(E.cur+1);
+$("bSay").onclick=()=>{const w=E.rows[E.cur];w&&say(w.han)};
+const eShow=()=>{const w=E.rows[E.cur];if(w&&!E.rev.has(w.i)){E.rev.add(w.i);touchSave(w)}erpRender()};
+$("bShow").onclick=eShow;$("dMean").onclick=$("dPy").onclick=$("dHan").onclick=eShow;
+$("dState").onchange=e=>{const w=E.rows[E.cur];if(!w)return;const v=+e.target.value;mark(w,v===1?"d":v===2?"x":null);erpRender()};
+$("dMemo").onchange=e=>{const w=E.rows[E.cur];if(!w)return;setMemo(w,e.target.value);erpRender()};
+$("dNo").onkeydown=e=>{if(e.key==="Enter"){const n=+e.target.value;const r=E.rows.findIndex(w=>w.no===n);if(r>=0){eGo(r);return}const w=A.words[n-1];if(w){E.f.d1=Math.min(E.f.d1,dayOf(w));E.f.d2=Math.max(E.f.d2,dayOf(w));erpCondFill();erpRefresh(w.han)}}};
+$("dDir").onchange=e=>{A.set.dir=e.target.value;saveSet()};
+["cD1","cD2","cState"].forEach(i=>$(i).onchange=()=>{erpRead();if(E.f.d2<E.f.d1){E.f.d2=E.f.d1;$("cD2").value=E.f.d1}E.order=null;erpRefresh()});
+$("cQ").oninput=()=>{erpRead();erpRefresh()};
+$("cDeck").onchange=async e=>{savePos();await openDeck(e.target.value);E.f.d1=E.f.d2=M.day;erpAll()};
+[["cH","h"],["cP","p"],["cM","m"]].forEach(([i,k])=>$(i).onchange=e=>{A.set.mask[k]=e.target.checked?1:0;saveSet();E.rev.clear();erpRender()});
+$("eMenu").onclick=async e=>{const b=e.target.closest("button");if(!b)return;const m=b.dataset.m;
+  if(m==="file")return openUpload(A.deck.id);if(m==="test")return startQuiz(E.rows,A.set.dir);if(m==="help")return openHelp();
+  if(m==="acct"){modal("계정",`<div class="list"><button class="btn" id="acNew">새 계정 만들기</button><button class="btn" id="acOut">로그아웃</button></div><div class="note">현재 사용자: ${esc(A.user.name)}${isAdmin()&&REMOTE?" (관리자)":""}</div>`);$("acNew").onclick=openSignup;$("acOut").onclick=logout;return}
+  if(m.startsWith("deck:")){savePos();await openDeck(m.slice(5));E.f.d1=E.f.d2=M.day;E.f.state="all";erpAll();return}
+  if(m==="today"){E.f.d1=E.f.d2=M.day}else if(m==="alld"){E.f.d1=1;E.f.d2=nDays()}else E.f.state=m;
+  E.order=null;erpCondFill();erpRefresh();document.querySelectorAll("#eMenu button").forEach(x=>x.classList.toggle("on",x===b||x.dataset.m==="deck:"+A.deck.id))};
+$("tbOpen").onclick=()=>openUpload(A.deck.id);
+$("tbNew").onclick=()=>{E.order={};A.words.forEach(w=>E.order[w.i]=Math.random());erpRefresh()};
+$("tbSave").onclick=()=>eToggle("d");
+$("tbDel").onclick=()=>confirmBox("진도 초기화",`${esc(A.deck.name)} 서랍의 ${esc(A.user.name)}님 외움·헷갈림·메모 기록을 지웁니다. 단어는 지워지지 않습니다.`,"삭제",async()=>{await flush();await call("clearProgress",A.deck.id);A.prog={};E.rev.clear();erpRender();toast("진도를 초기화했습니다")});
+$("tbMask").onclick=()=>{A.set.mask.m=A.set.mask.m?0:1;saveSet();$("cM").checked=!!A.set.mask.m;E.rev.clear();erpRender()};
+$("tbQuiz").onclick=$("bTest").onclick=()=>startQuiz(E.rows,A.set.dir);
+$("tbHelp").onclick=openHelp;
+$("eX").onclick=()=>{$("cQ").value="";erpRead();erpRefresh()};
+$("eMobile").onclick=()=>switchView("ios");$("eLogout").onclick=logout;
+
+/* ---------- 키보드 ---------- */
+document.addEventListener("keydown",e=>{
+  if(!$("ov").hidden){if(e.key==="Escape")closeModal();else if(Q&&/^[1-4]$/.test(e.key)){const b=$("ovB").querySelectorAll(".opt")[+e.key-1];b&&b.click()}else if(Q&&e.key==="Enter"){const n=$("qNext");if(n&&!n.hidden){e.preventDefault();n.click()}}return}
+  if(!$("login").hidden&&!$("lPin").hidden){if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace")pinKey("지우기");else if(e.key==="Escape")pinKey("취소");return}
+  if(!A.token||e.target.matches("input:not([type=checkbox]),select,textarea,[contenteditable]"))return;
+  if(A.view==="ios"&&M.tab==="tStudy"){
+    if(e.key==="ArrowLeft"){e.preventDefault();nav(-1)}else if(e.key==="ArrowRight"){e.preventDefault();nav(1)}
+    else if(e.key==="ArrowUp"){e.preventDefault();ac();bump("d")}else if(e.key==="ArrowDown"){e.preventDefault();ac();bump("x")}
+    else if(e.key===" "){e.preventDefault();M.rev.add("all");renderCard()}else if(e.key.toLowerCase()==="s"){const w=M.list[M.idx];w&&say(w.han)}}
+  else if(A.view==="erp"){
+    if(e.key==="ArrowDown"){e.preventDefault();eGo(E.cur+1)}else if(e.key==="ArrowUp"){e.preventDefault();eGo(E.cur-1)}
+    else if(e.key==="PageDown"){e.preventDefault();eGo(E.cur+ePg())}else if(e.key==="PageUp"){e.preventDefault();eGo(E.cur-ePg())}
+    else if(e.key===" "){e.preventDefault();eToggle("d")}else if(e.key==="Enter")eShow();else if(e.key.toLowerCase()==="s"){const w=E.rows[E.cur];w&&say(w.han)}}});
+
+/* ---------- 시작 ---------- */
+(async()=>{
+  if(!REMOTE)Local.seed();
+  const ss=LS.get("hsk.session",null);
+  if(ss&&ss.token&&!!ss.remote===REMOTE){try{await enterSession(ss.token);return}catch(e){LS.del("hsk.session");if(String(e.message)!=="AUTH")toast(errText(e))}}
+  showLogin();
+})();
+</script>
+
