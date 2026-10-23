@@ -13,6 +13,7 @@
 | `index.html` | 앱 전체 (한 파일) |
 | `config.js` | Supabase 연결 설정. 비워 두면 로컬 모드 |
 | `supabase/schema.sql` | 테이블과 보안 함수 |
+| `supabase/add_hsk3_hsk4.sql` | HSK 3급(1~3급 600)·HSK 4급(1~4급 1200) 서랍 추가 |
 | `supabase/seed.sql` | 기본 서랍 4개, 해커스 실전 2회 494개·해커스 실전 3회 388개 단어, 관리자 계정 |
 
 ## 1. GitHub Pages 켜기
