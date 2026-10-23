@@ -47,7 +47,7 @@ window.HSK_CONFIG = {
 
 - 기본 관리자: **이정빈 / 7052**
 - 누구나 첫 화면에서 *새 계정 만들기*로 계정을 만들 수 있고, 진도는 계정마다 따로 저장됩니다.
-- **서랍 만들기·파일 올리기·이름 바꾸기·비우기·삭제는 관리자만** 할 수 있습니다. 다른 계정을 관리자로 만들려면 Supabase **Table Editor → app_users**에서 `is_admin`을 `true`로 바꾸세요.
+- **서랍 만들기·파일 올리기·이름 바꾸기·비우기·삭제는 관리자만** 할 수 있습니다. 다른 계정을 관리자로 만들려면 Supabase **Table Editor → hsk_app_users**에서 `is_admin`을 `true`로 바꾸세요.
 - 암호를 5번 틀리면 5분 동안 잠깁니다.
 
 ## 단어 올리기
@@ -69,11 +69,13 @@ CSV 예시:
 
 ## 데이터 구조
 
+모든 테이블·함수 이름이 `hsk_`로 시작해서, 이미 쓰던 Supabase 프로젝트에 같이 넣어도 기존 테이블과 겹치지 않습니다.
+
 ```
-app_users      id, name, pin_hash(bcrypt), is_admin
-sessions       token, user_id
-decks          id, name, color, sort            ← 서랍 (모든 계정 공용)
-words          deck_id, ord, han, py, mn        ← 서랍 속 단어
-progress       user_id, deck_id, han, d(외움), x(헷갈림), c(횟수), t(최근), m(메모)
-user_settings  user_id, data(jsonb)             ← 하루 단어 수, 가리기, 마지막 위치 등
+hsk_app_users      id, name, pin_hash(bcrypt), is_admin
+hsk_sessions       token, user_id
+hsk_decks          id, name, color, sort            ← 서랍 (모든 계정 공용)
+hsk_words          deck_id, ord, han, py, mn        ← 서랍 속 단어
+hsk_progress       user_id, deck_id, han, d(외움), x(헷갈림), c(횟수), t(최근), m(메모)
+hsk_user_settings  user_id, data(jsonb)             ← 하루 단어 수, 가리기, 마지막 위치 등
 ```
