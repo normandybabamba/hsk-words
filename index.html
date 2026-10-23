@@ -660,7 +660,7 @@ const REMOTE=!!(CFG.supabaseUrl&&CFG.supabaseKey);
 /* 로컬 모드: 시안과 같은 저장 형식 (hsk.users / hsk.decks / hsk.p.<uid> / hsk.s.<uid>) */
 const Local={
   seed(){if(!LS.get("hsk.users"))LS.set("hsk.users",{u1:{name:"이정빈",pin:pinHash("이정빈","7052"),created:today()}});
-    if(!LS.get("hsk.decks"))LS.set("hsk.decks",[{id:"hsk3",name:"HSK 3급",color:"#34c759",words:[]},{id:"hsk4",name:"HSK 4급",color:"#007aff",words:SEED.hsk4},{id:"mock",name:"실전모의고사",color:"#ff9500",words:SEED.mock},{id:"hak45",name:"학원 4-5급",color:"#af52de",words:[]}])},
+    if(!LS.get("hsk.decks"))LS.set("hsk.decks",[{id:"hsk3",name:"HSK 3급",color:"#34c759",words:[]},{id:"hsk4",name:"해커스 실전 2회",color:"#007aff",words:SEED.hsk4},{id:"mock",name:"해커스 실전 3회",color:"#ff9500",words:SEED.mock},{id:"hak45",name:"학원 4-5급",color:"#af52de",words:[]}])},
   uid:tk=>String(tk).replace(/^local:/,""),
   list(uid){const p=LS.get("hsk.p."+uid,{});return LS.get("hsk.decks",[]).map(d=>{const q=p[d.id]||{};let dn=0,xn=0;d.words.forEach(w=>{const s=q[w[0]];if(s){if(s.d)dn++;if(s.x)xn++}});return{id:d.id,name:d.name,color:d.color,n:d.words.length,dn,xn}})},
   decksRaw:()=>LS.get("hsk.decks",[]),
